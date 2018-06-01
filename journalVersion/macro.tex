@@ -1,0 +1,39 @@
+\usepackage{amssymb}
+\usepackage{ifthen}
+\usepackage{xspace}
+
+\makeatletter
+
+\def\ie{\textit{i.e.},\xspace}
+\def\eg{\textit{e.g.},\xspace}
+
+
+\newcommand{\COMMENT}[1]{}
+\newcommand{\ndef}{\stackrel{\rm def}{=}}
+\newcommand{\minitab}[2][l]{\begin{tabular}{#1}#2\end{tabular}}
+
+
+\newboolean{showcomments}
+
+\setboolean{showcomments}{true}
+
+\ifthenelse{\boolean{showcomments}}
+  {\newcommand{\nb}[2]{
+    \fbox{\bfseries\sffamily\scriptsize#1}
+    {\sf\small$\blacktriangleright$\textit{#2}$\blacktriangleleft$}
+   }
+   \newcommand{\cvsversion}{\emph{\scriptsize$-$Id: macro.tex,v 1.9 2005/12/09 22:38:33 max Exp $}}
+  }
+  {\newcommand{\nb}[2]{}
+   \newcommand{\cvsversion}{}
+  }
+
+\newcommand\DANIEL[1]{\nb{Daniel}{#1}}
+\newcommand\DMG[1]{\nb{DMG}{#1}}
+\newcommand\MAX[1]{\nb{Max}{#1}}
+\newcommand\JWD[1]{\nb{JULIUS}{#1}}
+
+
+\newcommand\NEW[1]{\nb{NEW}{#1}}
+
+\newcommand{\varname}[1]{{\small\texttt{#1}}\xspace}

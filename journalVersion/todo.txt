@@ -1,0 +1,174 @@
+
+
+Goal of paper:
+"Do we have a good provenance technique here?"
+
+Additional message:
+"Bin2src has fundmental hard issues that cannot be resolved automatically.
+ Look at these wonderful and weird things we saw that support this message."
+
+
+The message of bertillionage: you want to guarantee recall, at the expense of precision,
+because precision can be done with other methods better.
+
+We have a spectrum of approaches here:
+
+- sha1-of-jar
+- sha1-of-contents
+- JESE-2011 (more aggressive signatures)
+- MSR-2011 (less aggressive signatures)
+- MSR-2010 (DiPenta licensing of jars, signature is FQN and nothing else!)
+
+
+
+
+Daniel and I will rewrite sections 5. and 6.  Here is the current plan:
+
+
+5. Implementation
+
+5.1 Building a Corpus
+
+5.2 Extracting the Signatures
+
+5.3 Matching a Subject Artifact to Candidates
+
+5.4  [Internal maven-on-maven] can be part of 5
+so we don't pollute the paper with too many sections. and keep the results brief.
+This is what we expect, we match it, but look, the distribution of bin2src indexes is spread like this.
+and some quick reasons.
+so we can now proceed to real experiments.
+
+
+6. Evaluation
+
+RQ1:  how useful is bin2bin?
+
+RQ2:  how useful is bin2src?
+
+6.1 Setting
+
+6.2 Results
+
+
+6.2.1 Baseline:  Debian
+
+sha1-jar-granularity  (ha!  2 matches of 964)
+sha1-class-granularity 
+bertillonage bin2bin
+bertillonage bin2src
+
+
+6.2.2 Industry Case Study (the Bank)
+
+sha1-jar-granularity
+sha1-class-granularity 
+bertillonage bin2bin
+bertillonage bin2src
+
+
+
+* The older forgotten todos
+** Reviews to deal with
+    - [ ] cite [1] Hung-Fu Chang and Audris Mockus. Constructing universal version
+history. In ICSE'06 Workshop on Mining Software Repositories, pages
+76-79, Shanghai, China, May 22-23 2006.
+    - [ ] cite [2] Audris Mockus. Large-scale code reuse in open source
+software. In ICSE'07 Intl. Workshop on Emerging Trends in FLOSS
+Research and Development, Minneapolis, Minnesota, May 21 2007. 
+    - [X] Asked about Maven reliability -- by keeping RQ3 we can deal
+      with this issue.
+    - [ ] What is the performance in terms of runtime of said technique 
+          - time it took run versus time to query?
+          - if Bertillonage is fast and dirty we have to prove it and
+            we have to show with a large corpus like Maven it doesn't
+            take long to discover this.
+    - [ ] Section 1 provenance versus origin analysis?  In the paper
+          we suggest fingerprinting is exact but Bertillonage is not
+          exact. Classically ML fingerprinting hasn't been exact
+          either, I think perhaps at the end of the Bertillonage
+          section or in the related work our stance of why
+          Bertillonage is not origin analysis and not fingerprinting
+          should be made a bit more clear.          
+* Abram's notes [C] means commented in document [I] ignore
+  - [C] Reviewers were correct, we claimed it was fast yet offer
+    little evidence. The fast argument will likely be an incremental
+    argument. Can we compare code cloning efficiency versus our technique?
+  - [I] can we cite DLL-Hell?
+  - [X] My affiliation should be UAlberta now (at least according MS
+    legal hehe).
+  - [X] Foo.jar could be named better in the intro -  httpclient.jar? 
+  - [X] Contributions will need updating
+  - [ ] Bertillonage versus finger-printing
+        - Bertillonage was used because finger-printing hadn't been
+          discovered, a motivation for us is that the fingerprint
+          hasn't been discovered, we need "bio-metrics" like
+          identifiers to get there.
+        - There's a result about how we can't compare programs to
+          indicate if they produce the same output (e.g. prove these
+          programs are the same yet both don't halt in non-trivial
+          ways). This would indicate that perfect identification of
+          code is unlikely.
+  - [ ] There's a defense against precision but instead a focus on
+    recall, right at the end of section 3.0. I think Recall at least
+    should be measured because that's what this paragraph is arguing.
+        Recall is did we find most of the relevant documents
+        Precision is how many of our retrieved documents relevant.
+        The goal is to narrow the search space, thus one does seem to
+        want to maximize both precision and recall at the same time:
+        - retrieved documents are relevant and the relevant documents
+          are retrieved.
+        - the near perfect measure used does not reflect this goal.
+          If the goal is to reduce the search space then one should
+          measure the different in search spaces. Also does the
+          technique reduce search spaces? Versus what? sha1? naive
+          search?
+          This point should be rewritten or carefully thought about.
+        - If one is going to push reduced search space, specify that
+          the accurate answer is so valuable that one will manually go
+          through the candidates.
+        - Inclusion index is pretty close to precision
+  - [X]  3.1 might be lost, -> might be lost when,
+  - [I]  4.0 claims of names not matching might not work, throw in
+         some Maven stats?
+  - [X]  Anchored Signature match is not defined before it is referred
+    to in 3.0. In 4.1 there is no introduction to anchored signature
+    match so it isn't clear why we're being shown this information. It
+    just needs an intro and motivation. For instance will all the
+    readers know that java class files contain this information such
+    that we can always compare against it?
+  - [X] Remember to update  which Maven we're using (date and size)
+  - [I] Mention why our parser can't do generics (a lot of that
+    information is not stored in the binary right?)
+  - [X] I think the distribution of similarity scores should be shown.
+  - [I] RQ1 and RQ2 should be reworded such that BINARY and SOURCE are
+    nearly the first visible words.
+    - RQSrc and RQJar/RQBin might be more memorable.
+  - [C] In results specify what is a one time cost or a cost that
+    could be done by say Maven or a 3rd party. Database creation.
+  - [C] How long did the 84 binaries take to classify?
+  - [X] 6.2 We need information about the sizes of the returned results, a
+    boxplot would work (or violin plot). This is where precision and
+    recall matter, I'm sure ESEM will pick on us over this. I would.
+  - [X] RQ2 results are glossed over.
+  - [X] For RQ1, we need to compare exact bin match versus the rest, to
+    show an improvement.
+  - [X] Discussion should mention lack of silver bullet
+  - [X] 7.1 binary-to-binary bridge is not clear, needs to clarify that:
+        by building a binary from source one can compare to the binary
+        corpus with binary-to-binary matching.
+  - [X] Android stuff could be elaborated on.
+** Abram Overview Notes
+  - [X] The main empirical issue is with the lack of reporting of the
+    distribution of the results and the use of exact match when it was
+    not an exact match.
+  - [ ] The lack of efficient and reliable fingerprinting should be
+    mentioned, if we had it we'd use it.
+  - [ ] Performance information needs to be updated and the
+    incremental calls should be explained. If you had a 80 binary
+    software project how long will this technique take?
+  - [X] The credibility of Maven needs to be dealt with (RQ3)
+  
+
+
+

@@ -1,0 +1,133 @@
+\pagestyle{headings}
+
+% Note that the line below could be modified to suit a
+% particular system since the "geometry" package behaves
+% differently in Unix, Windows and Mac, especially for the
+% top margins.
+% Adjust the parameter "top" (measuring the height of the
+% space allocated to a header) and "headsep" (measuring
+% the distance from the bottom of the header to the
+% first line of text.
+\usepackage[top=1.3in,left=1.5in,bottom=1in,right=1in,headsep=0.5in]{geometry}
+
+\usepackage{setspace}
+\onehalfspacing
+%\doublespacing
+
+% Headers and footers for thesis
+\usepackage{fancyhdr}
+
+\markboth{}{}
+\newcommand\startchapter[1]{\chapter{#1}\thispagestyle{myheadings}}
+\newcommand\startappendix[1]{\chapter{#1}\thispagestyle{myheadings}}
+\newcommand\startfirstchapter[1]{\chapter{#1}}
+
+% Manual addition of section to Table of Contents
+\newcommand\TOCadd[1]{\newpage\phantomsection\addcontentsline{toc}{chapter}{#1}}
+
+% Float Customization
+\renewcommand{\floatpagefraction}{0.01}
+
+% Customization of Tables of Contents and List of Figures/Tables
+\usepackage{tocloft}
+\renewcommand\cfttabpresnum{Table\ }
+\renewcommand\cfttabnumwidth{0.75in}
+\renewcommand\cftfigpresnum{Figure\ }
+\renewcommand\cftfignumwidth{0.80in}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+
+
+
+
+% Macros from the Bertillonage Journal paper:
+
+
+\usepackage[pdftex]{graphicx}
+%
+% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+
+% makes "C++" take up a little less space; man, those plus signs are big
+\usepackage{relsize}
+\newcommand{\Cpp}{{C\raisebox{0.2ex}{\ensuremath{\mathsmaller{++}}}}\xspace}
+\usepackage{paralist}
+\usepackage{color}
+\usepackage{fancybox}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{fmtcount}
+\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash]{caption}
+\usepackage{float}
+\usepackage{comment}
+\restylefloat{figure}
+
+\input{macro}
+
+\newenvironment{entry}%
+{\begin{list}{}{\noindent
+\renewcommand{\makelabel}[1]{\textbf{##1:}\hfil}%
+\setlength{\leftmargin}{1.5em}%
+\setlength{\itemindent}{1em}%
+}}%
+{\end{list}}
+
+\newenvironment{hassanbox}%
+{\vspace{1mm}\noindent\begin{Sbox}\begin{minipage}{0.97\columnwidth}}%
+{\end{minipage}\end{Sbox}\fbox{\TheSbox}}
+
+%% adds by migod
+\definecolor{darkgreen}{RGB}{0,128,0}
+\definecolor{darkblue}{RGB}{0,0,128}
+\definecolor{sienna}{rgb}{0.627451,0.321569,0.176471}
+\definecolor{forestgreen}{rgb}{0.133333,0.545098,0.133333}
+\definecolor{purple}{rgb}{0.627451,0.12549,0.941176}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\sienna}[1]{\textcolor{sienna}{#1}}
+\newcommand{\forestgreen}[1]{\textcolor{forestgreen}{#1}}
+\newcommand{\purple}[1]{\textcolor{purple}{#1}}
+\newcommand{\migod}[1]{\emph{\blue{Mike says: #1}}}
+\newcommand{\dmg}[1]{\emph{\red{Daniel says: #1}}}
+\newcommand{\abram}[1]{\emph{\forestgreen{Abram says: #1}}}
+\newcommand{\jad}[1]{\emph{\purple{Julius says: #1}}}
+
+\newcommand{\mytt}[1]{{\small \texttt{#1}\xspace}}
+
+%\newcommand{\rqOne}{How should we index our corpus of source and binary artifacts
+%to answer provenance queries?}
+
+%\newcommand{\rqTwo}{Does provenance require a perfect corpus?}
+
+%\newcommand{\rqThree}{Given an artifact in one form (e.g., binary), can we locate its complement (e.g., source)?}
+
+
+\newcommand{\rqOne}{How useful is the similarity index for narrowing the search space to find an original
+  \emph{binary} archive when provided a subject binary archive?}
+
+\newcommand{\rqTwo}{How useful is the similarity index for narrowing the search space to find an original
+  \emph{source} archive when provided a subject binary archive?}
+
+\newcommand{\rqThree}{How reliable is the version information
+stored in a jar file's name?}
+
+
+
+\newcommand{\gplNonDeclared}{ Source code is under the GPL, but the declared
+    license does not mention the GPL}
+\newcommand{\gplNotInCode}{ The declared license includes the GPL, while the source code does not}
+\newcommand{\gplIncompat}{ The declared license includes the GPL, however there is at least one file under an incompatible license}
+\newcommand{\gplMismatch}{ Mismatch of GPL version}
+
+\newcommand{\signature}[1]{\ensuremath{\sigma(#1)}}
+\newcommand{\querySurface}[1]{\ensuremath{\vartheta(#1)}}
+
+\newcommand{\signatureL}[1]{\ensuremath{\sigma_L(#1)}}
+\newcommand{\querySurfaceL}[1]{\ensuremath{\vartheta_L(#1)}}
+
+\newcommand{\signatureT}[1]{\ensuremath{\sigma_T(#1)}}
+\newcommand{\querySurfaceT}[1]{\ensuremath{\vartheta_T(#1)}}
+
+\DeclareCaptionType{copyrightbox}

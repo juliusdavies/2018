@@ -1,0 +1,170 @@
+
+          >>> Summary of the submission <<<
+
+This paper investigates a method to compare software artifacts based on
+signatures derived from those artifacts. The intended use is to discover if,
+and if so, which version of, a source entity (such as a library) is included
+in a given binary version of a system. The paper proposes a method to derive
+signatures for comparison from both source and binary artifacts and evaluates
+their matching capability in an empirical study in which the authors compare
+the binary artifacts of a commercial software system developed in Java with a
+large repository of signatures for various Java packages, derived from the
+Maven 2 central repository.
+
+
+
+          >>> Evaluation <<<
+
+The paper addresses an interesting and relevant research topic, and evaluates
+the proposed work in an empirical study. However, I'm not convinced of the
+validity of the definitions that are used and of the positive evaluation that
+follows from them.
+
+- your definition of what is a "perfect match" is very suggestive, but far
+ from perfect: the (webster) definition of perfect is "being complete of its
+ kind and without defect or blemish". If you have multiple matches that
+ *include* the correct one, it goes too far to call this a perfect match, as
+ there is still a (potentially unlimited) number of false positives, i.e.
+ blemishes. As we will see later, this crooked definition has a considerable
+ impact of the success percentages that you report in your study. Why not use
+ the standard retrieval measures of precision and recall?
+
+- your answer to RQ1: "the archive signature similarity index is highly useful
+ for finding original binary archives. We found correct-product or perfect
+ binary matches for 81 of the 84 binary jars in our sample set (96.4%)."
+ First of all, a correct-product match does not point at the original binary
+ archive so should not be included. Second, if we consider the normal
+ definition of perfect, you find perfect binary matches for 49 of the 84
+ binary jars in your sample set (which is only 58.3%).
+
+- the same holds to your answer to RQ2 which goes down from the reported 57
+ out of 84 (67.9%) to having correctly identified 34 out of 84 (i.e. 40.4%)
+
+ You set out to improve on the related work and address the problem of
+ finding the original source code for a given java binary, i.e. RQ2 is the
+ most central to this goal. Based on these corrected numbers, and combined
+ with your own discussion of the issues with your "parser" that turns java
+ source code into signatures, I can only conclude that this part of your
+ research needs more work and that it's too early for publication.
+
+Other issues:
+
+- in your empirical study: in the case where you have multiple matches with
+ similarity = 1. It is impossible to assess the value of your approach
+ without knowing the number of matching artifacts in these situations. More
+ importantly: what can you do, and how much effort does it take, to find out
+ which of the matches is the right candidate (esp. considering the fact that
+ in a real case you will not have the version number for the original binary
+ that you are trying to identify).
+
+- The threads to validity section does not match with what was earlier
+ described in the study: you discuss 35 jars for RQ3 whereas other parts of
+ the paper describe 84 jars. In addition you describe using a sample of 250
+ jars for answering RQ2 which was not mentioned before in the study
+ description (or anywhere else in the paper).
+
+- In the caption of Figure 3 you mention that this is the signature for the
+ class D.java from figure 1, but at this point it is not clear why you would
+ include the constructor sigma(M1) for the java code since that code has no
+ constructor...
+
+- It is unclear what to conclude from this work but I would expect a stronger
+ conclusion than "we found that the name of a binary jar will likely point to
+ the project from where it comes from, but that version numbers are sometimes
+ incorrect"
+
+Minor:
+
+- the table numbering and placement is confusing with table 2 appearing before
+ table 4 and 5 but in the text being referred to after references to table 4
+ and 5...
+
+- on page 6 you have no RQ3 but two RQ2's
+
+
+
+
+Second
+reviewer's
+review        
+
+          >>> Summary of the submission <<<
+
+The authors present an approach to discover where jar libraries come from. The
+approach, called Bertillonage, is based on the concept of developing a set of
+metrics that help to roughly identify jar libraries, so that someone using a
+jar library can get a fairly reliable answer to the question "where does this
+jar file originally come from"? The authors present a very impressive (in terms
+of amount of raw data they processed) empirical study to validate their
+approach.
+
+
+          >>> Evaluation <<<
+
+This is a very well written (one typo only, on page 6: inadequate) paper on
+what I would term "binary source code search". The authors do a great job at
+introducing the approach. However, as one reads through the paper, the original
+Bertillonage concept, which is based not he use of several metrics to identify
+an entity, is reduced to the analysis of normalized class signatures. Certainly
+a no-nonsense way to tackle the issues at hand, but a bit off from the original
+grand scheme. The implementation and the empirical evaluation has been
+performed in an impeccable way, although again, in reality this boils down to
+trying to discover the provenance of 84 jar files. It's a pity the authors did
+not perform a more extensive study, instead of focusing only on one application
+- since all the data is there. I find it excellent that the authors made their
+data available for replication. The approach, given the 84 jars, seems to work
+very well, but can hardly be generalized beyond that.
+
+Overall, this is an interesting read, but there is a big but: so what? The
+authors do not succeed in making the importance of their work important. The
+discussion section is very short and focused on the case study, while the
+conclusion is more a summary than anything else. I would have expected the
+authors to provide a number of reflections of what this work here represents.
+One could think for example of developing a "trust measure" for complete
+systems, where systems are fed into a tool and the result is some normalized
+value which expresses how clean the pedigree of the system is. Somehow, all
+this is at most hinted at, but no more.
+
+
+Third
+reviewer's
+review        
+
+          >>> Summary of the submission <<<
+
+In this paper the authors present Software Bertillonage which is about
+determining the provenance of a code entity (binary/code). The authors have
+also provided an example case study using an anonymous e-commerce application
+to demonstrate the idea.
+
+
+          >>> Evaluation <<<
+
+Overall, IMO this paper is well written, no typos I could spot. The idea in
+some sense is similar to a lot of the codematching work that has been done
+before and relies to a large degree on work bcel. That said, overall this is a
+very important problem in the software industry for maintenance, legal and
+compatibility issues and to the best of my knowledge is thinking along the
+correct lines.
+
+My issues are primarily with the case study.
+
+1. While I fully understand the need/desire of the ecommerce company to remain
+confidential, it would be very important to see how 51 of the 84 jars had a
+similarly index of 1.0. Was this company based on programs in Mavern. Did this
+company contribute to Mavern?
+
+2. Also wrt to these matches there is a problem of brute force. Right now the
+corpus used is mavern 2. What if this was done across the board and as you
+state had to be done for a forensic purpose across the world. Selecting the
+pool would be crucial.
+
+3. This also does not take into account language dependence. For example, this
+was done for Java but say for Ruby/Python...the list is quite endless.
+
+4. RQ3 is really not answered. It also is barely complete and looks like the
+authors wanted to force another question in. It looks hurriedly done thought I
+assume a significant amount of effort has gone in considering the manual
+effort.
+
+

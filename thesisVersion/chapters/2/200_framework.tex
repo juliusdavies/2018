@@ -1,0 +1,143 @@
+\startchapter{A Framework for Software Bertillonage}
+\label{chapter:problem}
+
+The goal of software Bertillonage is to provide computationally inexpensive
+techniques to narrow the search space when trying to determine the
+provenance of a software entity.  More formally, we define a `subject' as
+the entity whose provenance we are investigating.  We define `candidates'
+as a set of entities from a given corpus that are credible matches to the
+subject.  A desirable property of Bertillonage is thus to provide, for any
+subject, a relatively small set of high-likelihood candidates.
+
+We use the metaphor of Bertillonage --- an approximate approach fraught
+with errors --- rather than a more precise forensic metaphor of
+fingerprinting or DNA analysis to emphasize that while we may have a lot of
+evidence, often we do not have authoritative answers.  For example, one of
+the problems we examine involves trying to match a compiled binary against
+a large set of candidate source files. If we know the exact details of the
+creation of the binary --- the version of the compiler, the compilation
+options used, the exact set of libraries used for linking, etc. --- then we
+can compile our source candidates accordingly and use simple byte-to-byte
+comparison.  But in reality the candidate binaries are often compiled under
+varying conditions, and this can result in two binary artifacts that have
+the same provenance yet are not byte-for-byte equivalent in their binary
+representations.
+
+It may also be the case that ``the suspect is not on file'', i.e., that
+there may be no correct match for the subject within the corpus.  In our
+example of anchored signature matching
+(described in Section \ref{sec:anchored}),
+we compare Java
+archives from subject software systems against the Maven2 repository.
+However, Maven2 is not a comprehensive list of all possible versions of all
+possible Java libraries; it consists only of those library versions that
+someone has explicitly contributed.  So our subject archive may not be
+present within the corpus in any form (which is likely to be easy to
+determine), or the archive may be present but not the particular version
+that we seek.  Consequently, we must always be willing to consider the
+possibility that what we are looking for is not actually there.
+
+Thus, instead of precision we take as our goal of software Bertillonage the
+narrowing of a large search space.  We seek to prune away the low
+probability candidates leaving a relatively small set of likely suspects,
+against which we may choose to apply more expensive techniques, such as
+clone detection, compilation, or manual examination.  We realize that
+establishing provenance may take some effort, and that it may not even be
+possible in a given situation.
+
+
+\section{Bertillonage Metrics}
+
+As with forensic Bertillonage, it is necessary to define a set of metrics
+that can be measured in a potential subject and that will be relatively
+unique to it.  This is particularly difficult when trying to match binary
+to source code, because many of the original features of the source code
+might be lost during the compilation; for example, identifiers might be
+lost, some portions might not be compiled, source code entities are
+translated into binary form (which might include optimizations), etc.
+
+Given the variety of programming languages, we presume that each will
+require different Bertillonage metrics. For instance, compilation to Java
+is easier to analyze --- and contains richer information --- than
+compilation to \Cpp. In turn, \Cpp binaries maintain more information than
+compiled C, as \Cpp maintains parameters types to support overloading while
+C does not.
+
+Another important consideration is: what is the level of granularity of the
+Bertillonage? To match an entire software system it might not be necessary
+to look inside each function/method. But if the objective is to match a
+function/method, then the only information available to measure are method
+bodies and type signatures.
+
+Bertillonage is concerned with measuring the intrinsic properties of a
+subject, usually by considering different kinds of its sub-parts, which we
+will call ``objects of interest'' (OOIs).  These measurements can be
+performed in various ways:
+
+\begin{description}
+
+\item{\bf Count-based:} Count the \emph{number} of OOIs that the subject
+    contains, such as number of calls to external libraries, or uses of an
+    obscure feature (e.g., How many times is $setjmp$, $longjmp$ used);
+
+\item{\bf Set-based:} Compute a \emph{set} of OOIs that the entity contains,
+    such as the string literals defined by this entity\footnote{\emph{The
+    GPL Compliance Engineering Guide} recommends the extraction of literal
+    strings to determine potential licensing
+    violations~\cite{GPLcomplianceGuide}.}, the set of classes defined in a
+    package, or the set of methods in a class;
+
+\item{\bf Sequence-based:} Compute a \emph{sequence} of OOIs in the entity
+    (i.e., preserving the order), such as the sequence of method
+    signatures of a class, the (lexical) sequence of calls within a method,
+    the sequence of tokens types, etc.;
+
+\item{\bf Relationship-based:} Consider external OOIs that the subject is
+    \emph{related to} in some way; for example, what dynamic libraries are
+    used by this program, what externally-defined interfaces are
+    implemented, what exceptions are thrown?
+
+%--     What C standard library functions are used?
+%--     What is the internal call graph of this program?
+
+\end{description}
+
+The dimensionality of possible software Bertillonage metrics also includes
+the \emph{granularity} (code snippet, function / method, class / file,
+package / namespace), \emph{artifact kinds} (source code, binary,
+structured text, natural language), and the \emph{programming language} (C,
+\Cpp, Java).  A good Bertillonage  metric should be computationally
+inexpensive, applicable to the desired level of granularity and programming
+language, and when applied, it should significantly reduce the search
+space.
+
+%-- (i.e., match few candidates from a large number of potential ones).
+
+
+%-- \begin{table}[h]
+%--   \centering
+%-- \begin{tabular}[h]{ll}
+%-- \hline
+%--  Granularity         & Code Snippet      \\
+%--                      & Function/Method    \\
+%--                      & Class              \\
+%--                      & Package            \\
+%--                      & Program/Library    \\
+%--                      & etc.\\
+%-- \hline
+%--  Type of Subject     & Source             \\
+%--                      & Binary             \\
+%-- \hline
+%--  Type of Metric      & Count-based        \\
+%--                      & Set-based          \\
+%--                      & Sequence-based     \\
+%--                      & Relationship-based \\
+%-- \hline
+%--  Applicable Language & C                  \\
+%--                      & Java               \\
+%--                      & etc.               \\
+%-- \hline\end{tabular}
+%--   \caption{Characteristics of Bertillonage Metrics}
+%--   \label{tab:bertillonage}
+%-- \end{table}
+

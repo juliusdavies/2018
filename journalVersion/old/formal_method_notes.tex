@@ -1,0 +1,109 @@
+
+\section{Rough Sketch of Formal Method}
+
+
+
+
+Goal and Definitions:
+---------------------
+
+1.  We want to rank any pairing of a binary archive file
+    with a source archive file, ie. is a given pair more or less related
+    than other pairings?  We ignore file names when determining the rank,
+    so the fact a binary and source archive might have very similar
+    names (e.g. foo-1.2.3-src.zip vs. foo-1.2.3.jar) does not effect the
+    rank.
+   
+2.  A source archive is defined as any zip, tgz, tar, tar.bz2 or jar file
+    that contains Java source files (*.java) at any depth.
+
+3.  A binary archive is defined as any zip, tgz, tar, tar.bz2 or jar file
+    that contains Java binary files (*.class) at any depth.
+
+4.  Archive files that contain both *.java and *.class are measured twice:
+    once as a source archive, and once as a binary archive.
+
+5.  We assume that when an upstream project releases both foo-1.2.3-src.zip
+    and foo-1.2.3.jar there is a 1-to-1 mapping between the *.java and *.class
+    files therein.  Unit tests often break this assumption, since they are
+    usually included in the source archive but not in the binary archive.
+
+
+Analyzing An Archive File
+---------------------
+
+1.  In the previous section we defined a string representation of source
+    and binary Java files that is identical when the source file creates
+    the binary file [JWD:  need a better word for this].
+
+2.  Recall:  the string representation is based on attributes of the class
+    and its methods which are easily extractable from both the binary and
+    source forms.  These attributes might include:
+
+      - Method names, class name.
+
+      - Class inheretance tree.
+
+      - Method parameter types
+        (note:  parameter names are not extractable from the binary form,
+         but parameter type information is).
+
+      - Method order.  We found no example of a Java compiler re-ordering
+        the methods in a class from the order they appear in the original
+        source file.
+
+      - Other attributes.
+
+3.  Our string representation over-matches:  there are cases where an
+    identical representation is generated even though the source file
+    \em{does not} create the binary file.  Consider the following two
+    source files. In this example it is impossible to identify the
+    differentiating attribute (+ instead of *) without fully decompiling
+    the binary forms:
+
+    // Version 1.0
+    package one.two.three;
+    public class Four {
+      public static int getNumber() { return 2 + 2; }
+    }
+
+    // Version 2.0
+    package one.two.three;
+    public class Four {
+      public static int getNumber() { return 2 * 2; }
+    }
+
+    Nonetheless, since we include package and class name among our extractable
+    attributes, matches such as these indicate a relationship (ie. code
+    evolution) between the files.  Cases of random co-incindental matches are
+    practically impossible; developers on distinct projects explicitly takes
+    measures to avoid such naming collisions since linking bugs could result in
+    their applications.
+
+
+Ranking The Pairs
+---------------------
+
+1.  A user queries our code-search engine by uploading a binary archive file.
+    They are essentially asking, "Find the source archive with the largest
+    number of matching string representations."
+
+2.  We generate string representations for each binary file inside the uploaded
+    file.  A large archive such as android.jar might generate thousands of
+    these 'signatures' or 'fingerprints', whereas a small archive such as
+    commons-codec.jar might generate less than twenty:  one for each *.class
+    file therein.
+
+3.  We then query our index to find every source archive file that contains at
+    least one matching fingerprint.
+
+4.  Of these we evaluate each pairing as a set operation:
+
+    For each pair:
+      [binary fingerprints]  INTERSECT  [source fingerprints]
+
+5.  We return the pairing with the largest intersection.
+    Note:  For convenience all of the above steps use a SHA1 hash of the
+    string representation.
+
+

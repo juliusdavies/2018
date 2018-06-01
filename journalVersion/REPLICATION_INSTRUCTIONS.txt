@@ -1,0 +1,62 @@
+
+grep -h '^F;' partI/*.out.* partT/*.out.* > files.unsorted.txt
+grep -h '^S;' partI/*.out.* partT/*.out.* > sigs.unsorted.txt
+bash -c "time sort -u -S 3000000 files.unsorted.txt > files.sorted.txt" &> sort.files.out
+bash -c "time sort -u -S 3000000 sigs.unsorted.txt  > sigs.sorted.txt"  &> sort.sigs.out
+bash -c "time xz -9 -c files.sorted.txt > files.sorted.xz" &> xz.files.out
+bash -c "time xz -9 -c sigs.sorted.txt  > sigs.sorted.xz"  &> xz.sigs.out
+
+
+OR MAYBE?
+
+#!/bin/bash
+
+date
+echo "Starting xz of files..."
+bash -c "time xz -9 -c files.sorted.txt > files.sorted.xz" &> xz.files.out
+
+date
+echo "Starting xz of sigs..."
+bash -c "time xz -9 -c sigs.sorted.txt  > sigs.sorted.xz"  &> xz.sigs.out
+date
+
+
+
+
+
+1. Inside [debian6.0-squeeze-exploded] directory, run the following command:
+
+     find -type f -iname \*.jar | sort > jars
+
+
+2. Not all jars extracted in previous step have "two votes" of version
+   identification.  Filter list of jars down to those with solid version
+   information like so:
+
+java -cp sig-extractor.jar ca.juliusdavies.signature.DebFilter jars  > jars_filtered
+
+
+
+3. Run this to get performance data (/var/tmp/minus4 is just a file containing "-4 +" with no newline):
+
+
+find run_001/debian_and_ecommerce-qs.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_run1.csv
+find run_002/debian_and_ecommerce-qs.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_run2.csv
+find run_003/debian_and_ecommerce-qs.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_run3.csv
+
+
+find run_001/debian_and_ecommerce-qj.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_jar1.csv
+find run_002/debian_and_ecommerce-qj.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_jar2.csv
+find run_003/debian_and_ecommerce-qj.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_jar3.csv
+
+find run_001/debian_and_ecommerce-qh.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_sha1.csv
+find run_002/debian_and_ecommerce-qh.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_sha2.csv
+find run_003/debian_and_ecommerce-qh.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_sha3.csv
+
+find run_001/debian_and_ecommerce-qo.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_src1.csv
+find run_002/debian_and_ecommerce-qo.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_src2.csv
+find run_003/debian_and_ecommerce-qo.j -type f  -exec bash -c 'echo `cat {} | wc --lines | cat /var/tmp/minus4 - | bc`,  ,`head --lines=1 {}`' \; > z_src3.csv
+
+
+
+

@@ -1,0 +1,413 @@
+
+\section{Evaluation}\label{sec:evaluation}
+
+\label{sec:method}
+
+To validate any provenance technique we need a sample of artifacts from
+outside our corpus, and we need ``ground truth'' about these artifacts.  We
+can then apply our technique to determine provenance information about each
+of the sampled artifacts and compare the answers returned with the ground
+truth.  However, we have a confounding variable.  We do not possess a
+perfect corpus.  Should our technique fail, do we blame our method for
+indexing the artifacts, or do we blame imperfections in the corpus?
+
+To control for this variable, we assume that byte-oriented fingerprinting
+techniques are valid.  By applying byte-oriented fingerprinting techniques
+alongside our Bertillonage technique, we introduce a baseline against which
+our new technique can be objectively measured.  With the validity of our
+technique firmly established, we can then use our corpus and our sampled
+artifacts to further explore the following research questions:
+
+
+
+\vspace{0.7em}
+
+% RQ1 = How well does bin2bin work?
+\textbf{RQ1}: \textbf{\rqOne}
+
+%Should we use binary fingerprint indices,
+%where only exact byte-for-byte matches are possible?  Or should we use
+%Bertillonage indices, such as anchored signature matching, to expand our
+%range of possible matches?
+
+\vspace{0.7em}
+
+% RQ2 = How well does bin2src work?
+\textbf{RQ2}: \textbf{\rqTwo}
+
+% RQ2 = Is Maven a good corpus?
+%Or can a corpus such as the Maven2 Central Repository, with its incompleteness, redundancy, and disorganization,
+%still be useful?
+%Is there a set of characteristics a corpus should possess to be considered ``good enough'' for provenance analysis?
+
+\vspace{0.7em}
+
+% RQ3 = Are jar names reliable?
+\textbf{RQ3}: \textbf{\rqThree}
+
+
+% RQ3 = Can we find the source?
+%This is the hard problem of provenance, as it relates to compiled computer programs:
+%given a binary, can we find its source?   Byte-for-byte fingerprint approaches fail here, of course,
+%since the original (the answer) is a transformation of the subject (the question).
+%Our Bertillonage technique is designed as an exploratory stab
+%at this problem, and as such, what do we learn?
+
+
+
+%Since provenance is important to software
+%developers, name and release is often encoded directly into an artifact's file name
+%(e.g., oro-2.0.7.jar).  Nonetheless developers may omit the release numbering, or
+%they may mistype it.  Also, in some cases an artifact internally encompasses additional 
+%artifacts, rendering the file name inadequete for communicating the versions of the encompassed
+%releases.  RQ3 considers the artifact's file name as a baseline technique for
+%determining provenance against which RQ2 and RQ1 can be compared.  How
+%often is the filename incorrect, and how often is the filename simply inadequete?
+%Is the additional expense of building the index and executing the queries for
+%anchored signature matching worth the trouble?
+
+
+\subsection{Setting}
+
+%\abram{ explain setting  }
+
+\subsubsection{Building A Corpus}
+
+We mirrored the Maven2 central repository (from July 25th to July 30, 2011) using the
+following command:
+
+\hspace{2em} \quad{\mytt{rsync -v -t -l -r mirrors.ibiblio.org::maven2 .}}
+\vspace{0.3em}
+
+We used the \mytt{ibiblio.org} mirror because \mytt{repo1.maven.org}
+does not allow unknown parties direct connections via \mytt{rsync};
+\mytt{repo1.maven.org} also bans HTTP crawlers.
+Our download from \mytt{ibiblio.org} averaged 350KB/second.
+Since we retained our initial 150GB mirror from a year earlier
+the \mytt{rsync} command needed to only download the remaining 125GB
+of artifacts, requiring 4 days to download.  We re-ran the \mytt{rsync} command
+on the final day of downloading (June 30th)
+to ensure that our version was more or less identical to the ibiblio
+mirror at that time.
+Thus we obtained over 275 GB of jars, zips, tarballs, and other files.
+Maven contained 360,000\footnote{Values are rounded to nearest 10,000.}   
+% non-rounded:     359,421
+different archives (\mytt{.tar}, \mytt{.zip}, \mytt{.tar}, \mytt{.war},
+\mytt{.tgz}, \mytt{.ear}, and \mytt{.jar}). Many of them contained other
+archives within them.  When uncompressed, they resulted in 130,000
+% non-rounded:    130,738
+source archives (a source archive contains at least one Java file), but
+only 110,000 
+% non-rounded:    106,723
+were unique.  It contained 650,000                                    
+% non-rounded:    647,763
+binary archives (each contained at least one class file), but only 140,000
+% non-rounded:    144,049
+were unique.  These archives contained 7,140,000
+% non-rounded:  7,139,261
+Java files (1,650,000                                                 
+% non-rounded:  1,648,594
+distinct), and these generated 920,000 unique signatures.                 
+% non-rounded:    921,690
+
+We processed  19,780,000                                              
+% non-rounded: 19,775,475
+class files (2,430,000  distinct)\footnote{We only count outter classes.
+Class files containing a \mytt{\$} (dollar-sign) character in their name are assumed to be inner classes,
+and are not included in these tallies.  For example, only 3 of the class files listed earlier in Table~\ref{tab:asym} would count:
+\mytt{A.class}, \mytt{B.class}, and \mytt{C.class}.  These do not contain
+\mytt{\$} in their names, whereas the other 4 classes do.}
+% non-rounded:  2,431,413
+which generated  1,510,000                                             
+% non-rounded:  1,509,761
+distinct signatures.  We observed there are 590,000 (or 39\%) fewer
+distinct signatures among our source files compared to our class files.
+This is despite the observation that a typical source archive often
+contains more signatures than its corresponding binary archive, since the
+source archive is more likely to contain unit tests.  This discrepancy
+suggests Maven contains many binary archives for which there is no source
+code, a fact we confirmed previously in section~\ref{sec:mavenExplore}.
+
+We used the Canada Western Research Grid~\cite{WCRG} to extract these signatures. The
+extraction took approximately 8 hours, which was equivalent to 325 hours of a
+single CPU. Once the signatures were extracted, a PostgreSQL database was
+created from the results; the database was 11GB in size (including indexes).
+Bulk loading the compressed data (pre-sorted) directly from disk into two tables
+required 30 minutes on an Intel Core i3 laptop with a 7200 RPM hard-drive.
+Creating five single-column indexes required 90 minutes.
+A final 3 hours was spent pre-computing distinct signature tallies
+for each jar file.  In total 5 hours were spent creating the database from the
+extracted data.
+
+Initial bertillonage queries of our database ran very slowly, taking several minutes
+per jar file analyzed.
+Our \mytt{WHERE} clauses contain long chains of \mytt{OR} conditions, e.g., a typical
+SQL query from our tool looks like
+\mytt{WHERE sig=\emph{class1} OR sig=\emph{class2} OR sig=\emph{class3}...}, and may include several thousand
+of these \mytt{OR} conditions,
+one for each class in the jar file.
+We realized that PostgreSQL's query optimizer, when planning these huge \mytt{WHERE} clauses,
+was erroneously assuming full-table scans would run faster than index scans.
+We tuned PostgreSQL's query optimizer to avoid full-table-scans whenever
+possible by setting \mytt{enable\_seqscan = off} in the configuration file.
+This resulted in most queries taking less than one second, with the slowest queries
+requiring at most 20 seconds.  Section~\ref{perf} contains additional concrete
+performance details about our implementation.
+
+
+
+\subsubsection{Experimental Subjects:  945 Jar Files From Debian 6.0}
+
+To obtain a sample of artifacts outside our corpus we looked at the Debian
+GNU/Linux distribution.  Many Java libraries are compiled into discrete,
+installable packages in this large operating system.  The packages, called
+\emph{Debs}, include name, version, and dependency information that is
+recorded by Debian maintainers.  These maintainers often possess
+familiarity and expertise related to the packages they oversee, thus we are
+confident the provenance information recorded by these experts is of high
+quality, and can be considered reasonably close to ground truth.  The Deb
+format can be used to package any type of installable application, not just
+Java applications, but for our purposes we looked only at packages
+containing Java libraries.  We chose the most recent stable release, Debian
+6.0 ``Squeeze'', released on February 6th, 2011, from which to collect
+packaged Java artifacts.
+
+Debian 6.0 contains over 1,750 Java jar files.  However, in some cases we
+noticed the provenance information recorded by the Debian package
+maintainers was nuanced and complex, and required time and effort to
+properly understand.  For example, one particular Debian package,
+\mytt{libgdata-java\_1.30.0}, was specified as version 1.30.0, and yet
+the jars inside this package were marked with a variety of version numbers:
+
+\begin{itemize}
+
+\item \mytt{libgdata-java\_1.30.0-1\_all.deb/gdata-core-1.0.jar}
+\item \mytt{libgdata-java\_1.30.0-1\_all.deb/gdata-docs-2.0.jar}
+\item \mytt{libgdata-java\_1.30.0-1\_all.deb/gdata-photos-1.0.jar}
+\item \mytt{libgdata-java\_1.30.0-1\_all.deb/gdata-youtube-2.0.jar}
+\item etc...
+
+\end{itemize}
+
+None of these jars included the version `1.30.0' within their own names.
+To make our analysis easier, we decided to filter out all jars that did not
+include the same version number in their name as that of their containing
+package.  In this way we reduced our sample from 1,750 jars down to 945.
+We believe this filtering further improves the ground
+truth of our sample, since the version is specified in two places for each
+jar.  In a way, each jar possesses two `votes' regarding its encoded
+version information.
+
+We are not attempting to validate byte-oriented fingerprint techniques,
+such as SHA1.  We assume byte-oriented fingerprint techniques work, and we
+use them as a measuring stick from which to compare our signature based
+Bertillonage technique.  We assume fingerprint approaches achieve 100\%
+precision, and that false positives are impossible.\footnote{The chance of
+a birthday collision from SHA1 in our data set is less than $10^{-18}$.}
+For fingerprints of archive files, any match is considered equivalent to
+ground truth, even if the matched name is different, since they are
+byte-for-byte identical.  Similarily, for fingerprints of archive contents,
+any match that scores 1.000 similarity is considered equivalent to ground
+truth.  Fingerprint matches of archive contents scoring 0.999 similarity or
+less are \emph{not} considered ground truth, and if they represent the best
+match, we consider these as experimental results for validation, rather
+than ground truth for measuring against.
+
+
+\subsubsection{Replicating An Industrial Case Study}
+
+In a related research project~\cite{Davies11} we performed a license
+and security audit of a real world e-commerce application.  The audits had
+to be performed against both the binary and source code forms of these
+included libraries.  Before we could conduct the audits, we needed to
+determine the provenance of all included libraries.  In this study we
+replicate the provenance phase using 81 jars from the other project's
+replication package.\footnote{http://juliusdavies.ca/2011/icse/src/}
+
+Accurate and precise provenance information forms an important foundation
+for many types of higher-level analyses.  Such analyses include, among
+others, license audits, security vulnerability scans, and patch-level
+assessments (as required by the PCI DSS security standard).  A license
+audit of software dependencies must reflect the reality that software
+licenses sometimes evolve (change between releases).  Similarily, known
+security holes in libraries will affect specific releases or version
+ranges.  The PCI DSS requirement \#6, ``All critical systems must have the
+most recently released, appropriate software patches,'' cannot be satisfied
+without knowledge of the existing patch versions.  In this vein we believed
+that conducting a license audit and a security audit would provide real
+value to the developers of the e-commerce application, while also providing
+us with a chance to test our Bertillonage approach in the field.
+
+
+
+%We applied our technique in two different modes,  binary-to-binary, and source-to-binary.
+
+
+
+
+
+
+% RQ1 = What kind of index to use?
+
+% RQ2 = Is Maven good enough?
+
+% RQ3 = Can we find the sources?
+
+%For RQ1, for each of the 81 e-commerce jars, we computed their
+%similarity index against every binary archive in the corpus,
+%and selected the set of matches with the highest similarity
+%as the binary archive match.
+
+%For RQ2, the same procedure is performed as in RQ1, but instead
+%the similarity index is computed against every source archive
+%in the corpus.
+%For RQ1 and RQ2 we classified a match into one of three categories:
+
+\subsubsection{Measuring Results}
+
+We define one byte-oriented index (``Fingerprint Index"), and one
+Bertillonage index (``Anchored Class Signature Index").  Using the indices,
+we define four matching techniques (two per index).  Here are the four
+matching techniques, followed by a shorthand tag we use later to refer to
+them.
+
+\begin{description}
+\item \textbf{Fingerprint Index, Identical Archive} (sha1-of-jar)
+
+Our fingerprint index stores SHA1 fingerprints of all archive files, as
+well as all source and class files.  Therefore, an easy way to query the
+corpus is to simply take the SHA1 fingerprint of the subject archive and
+see if anything matches.   A match found in this way represents a
+byte-for-byte identical copy of the subject archive.  We also use this
+index to filter out duplicate results reported by the other matching
+techniques.
+
+\vspace{0.7em}
+\item \textbf{Fingerprint Index, Identical Contents} (sha1-of-classes)
+
+This matching technique scans a subject archive to generate a series of
+SHA1 fingerprints, one per class scanned.  We then query the corpus using
+the same \emph{similarity}, \emph{inclusion}, and \emph{containment}
+metrics described earlier.  But instead of comparing sets of anchored class
+signatures, we compare sets of bytecode.  Some pre-processing is required
+to properly account for inner-classes, since we want a change to the
+inner-class's bytecode to effect the outer class's fingerprint, even in
+cases where the outer class did not change (rare, but we observed some
+instances).
+
+\vspace{0.7em}
+\item \textbf{Anchored Class Signature Index, Binary-To-Binary} (bin2bin)
+
+Here we use our Bertillonage technique to find matches as described in
+section~\ref{sec:finding}.  For each jar file in our sample we extract the
+signatures from the bytecode, and we build a query from these signatures.
+The query is configured to only examine matching \emph{binary} signatures in the corpus.
+
+
+\vspace{0.7em}
+\item \textbf{Anchored Class Signature Index, Binary-To-Source} (bin2src)
+
+Again we use our Bertillonage technique to find matches as described in
+section~\ref{sec:finding}.  We examine the bytecode in each jar file, but
+in this case the query is configured to examine matching \emph{source} signatures in
+the corpus.  
+
+
+\end{description}
+
+\vspace{0.7em}
+
+\noindent We classify matches into one of three quality levels: High
+Quality (HQ), Low Quality (LQ), and No Match.  We further divide each
+quality level into subcategories that communicate our criteria for
+evaluating match quality.  These subcategories also allow us to report some
+cross-tabulated results, so we can directly compare results between the
+four matching techniques.
+
+
+\begin{enumerate}
+\item \textbf{High Quality (HQ):} 
+    To be considered a high quality match, the top-ranked set of matches
+    (those tied for best similarity score) must contain one candidate that
+    satisfies one of the following four conditions:
+
+\begin{itemize}
+
+\vspace{0.7em}
+\item \textbf{\emph{HQ1.} Identical archive:}
+    The candidate is a byte-for-byte identical match, regardless of name or
+    version information encoded in the candidate's name.
+
+\vspace{0.7em}
+\item \textbf{\emph{HQ2.} Identical contents:}
+    The contents of the candidate (class files) all match byte-for-byte
+    with the contents of the subject.  There are no unmatched contents in
+    either the candidate or the subject.  These matches are considered
+    successful regardless of name or version information encoded in the
+    candidate's name.
+
+\vspace{0.7em}
+\item \textbf{\emph{HQ3.} Expected match:}
+    The candidate's name and version information is identical to the
+    expected name and version information.
+
+\vspace{0.7em}
+\item \textbf{\emph{HQ4.} Version off by final digit:}
+    The candidate's name is identical, and the version information is only
+    different in its final character, e.g., a match of
+    \mytt{ezmorph-1.0.4.jar} against ground truth of
+    \mytt{ezmorph-1.0.6.jar} is considered a high quality match.
+
+\end{itemize}
+
+\vspace{0.7em}
+\item \textbf{Low Quality (LQ):}
+      Any match that is not classified as high quality is classified as low
+      quality.  We further subdivide low quality matches into two types:
+
+\begin{itemize}
+
+\vspace{0.7em}
+\item \textbf{\emph{LQ1.} Version off by many digits:}
+    The candidate's name is identical but the version information is
+    different, and this difference is not just in the final digit, e.g.,  a
+    match of \mytt{serp-1.13.1.jar} against ground truth of
+    \mytt{serp-1.14.1.jar} is considered a low quality match.  Also
+    matches where we knew the candidate's name was an older name for the
+    library are also classified in this category, e.g.
+    \mytt{xml-apis-2.0.2-sources.jar} was classified as a LQ1 match
+    against \mytt{crimson-1.1.3.jar} rather than a LQ2 match because we
+    happened to know the library had changed its name from `crimson' to
+    `xml-apis.'
+
+\vspace{0.7em}
+\item \textbf{\emph{LQ2.} Not useful:}
+    The candidate's name and version information did not provide
+    information useful for provenance analysis.  Due to the \emph{anchored}
+    nature of our signatures, these are not false positives.  Remnants of
+    past cloning, branching, or merging often show up in many of our
+    queries, but these fragments usually sit near the bottom of the
+    returned results, with low \emph{similarity} scores.  However, when a
+    hole in our corpus precludes the correct match, these fragments can
+    achieve the highest score.  We say these results are not useful for
+    provenance analysis.  Users may nonetheless find these results useful
+    for other purposes, such as evolution, cloning, or descendant analyses.
+
+
+
+
+\end{itemize}
+
+\vspace{0.7em}
+\item \textbf{No Match}
+      While not technically a type of match, this is an important category.
+      In all experimental and case-study results a portion of the sampled
+      artifacts result in no matches at all.
+
+\end{enumerate}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "000_main"
+%%% End: 

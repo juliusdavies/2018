@@ -1,0 +1,322 @@
+
+Date:      Dec 11, 2011
+To:        "Julius William Davies" juliusdavies@gmail.com
+From:      "Empirical Software Engineering" lutchelle.comparativo@springer.com
+Subject:   Decision on your Manuscript #EMSE615
+
+Dear Mr. Julius William Davies:
+
+We have received the reports from our advisors on your manuscript,
+"Software Bertillonage Determining the Provenance of Software
+Development Artifacts", which you submitted to Empirical Software Engineering.
+
+Based on the advice received, the Editor feels that your manuscript could be
+accepted for publication should you be prepared to incorporate minor revisions.
+ When preparing your revised manuscript, you are asked to carefully consider
+the reviewer comments which are attached, and submit a list of responses to
+the comments.  Your list of responses should be uploaded as a file in addition
+to your revised manuscript.
+
+In order to submit your revised manuscript electronically, please access the
+following web site:
+
+     http://emse.edmgr.com/
+
+Your revision due date is on Jan 10, 2012.
+
+We look forward to receiving your revised manuscript.
+
+
+Best regards,
+
+    The Editorial Office
+    Empirical Software Engineering
+
+
+COMMENTS FOR THE AUTHOR:
+
+
+********
+
+Thank you very much for your submission to the Empirical Software
+Engineering journal.
+
+All the three reviewers liked the submission ("the paper easily
+passes the threshold for novel contents", "This paper is written
+very clearly", "the work is well motivated") and appreciated the
+new material that was added compared to the previous MSR version
+("The new material is considerable, and convincing", "this
+extension is a considerable extension of the original paper").
+However, in adding the new parts, a number of minor issues have
+been raised which need to be addressed before the paper can be
+accepted. Please refer to the reviewers' comments for these minor
+issues.
+
+Again thank you very much for your submission. We look forward to
+the revised version of the paper.
+
+********
+
+Reviewer #1:
+---
+The article presents a technique, software bertillonage,
+to determine the provenance of a development artifact (e.g. a library)
+among large amounts of data. There are various applications to this,
+including determining the exact version of a library one is using (and
+whether it is the latest version), or whether there is a licensing conflict.
+
+Compared with the version published at MSR 2010, this version has the
+following extensions (I wish this was indicated in a cover letter or
+the introduction!):
+
+- a different tool implementation that extracts more features, making
+  signatures of entities more complete.
+  
+- a new snapshot of Maven (twice as large), as a basis for the repository of
+  artifacts.
+
+- a replication of the study in the MSR paper with the new parameters
+
+- a new, larger study, based on 945 jar files found in debian
+
+- comparisons with other techniques (byte code fingerprinting)
+
+- more data on performance concerns.
+
+
+
+The paper's problematic is as relevant as before.  The new material is
+considerable, and convincing; this means the paper easily passes the threshold
+for novel contents. I however have a few comments that I would like to be
+addressed in the next revision:
+
+- Document the changes w.r.t. the previous version in the introduction (the
+  previous version is mentioned in passing once, in the middle of the paper;
+  this is not enough).
+
+- on page 15, you mention a challenge about the asymmetry of the java language.
+  I would like the paper to explicitly mention the implications of this
+  challenge, and the measures that were taken towards it.
+
+- still on page 15, you mention the possibility of bytecode manipulators as a
+  potential problem. A quantification of the problem right here would be nice
+  (there is a bit of data on page 18 on that).
+
+- pages 19 and 20: there is a summary which also includes a summary, making it
+  repetitive.
+
+- page 21 and later: the title "An Experiment" is not descriptive enough
+
+- page 22: could you elaborate on the filtering of the jars related to version
+  numbers? The consequences of this are unclear.
+
+- page 29 and later: I would have liked a discussion of the differences between
+  the replication and the original experiment. Are the results identical or
+  not?  Given the changes in the precision of the signatures, and the large
+  repository, one would expect some changes. It would be especially interesting
+  to know which of the  two changes of parameters had the most impact.
+
+- page 33: I like the section on performance, but it could use more precision.
+  The paper says: "as table 11 suggests ?", and then extrapolates the numbers.
+  Why not put them in the table itself? Also, the paper mentions that the time
+  to zip and unzip makes things much slower, without specifying further.
+  I would expect the figures about that to be included in the paper.
+
+- page 34: the explanations of table 12, and figures 7 and 8 are way too
+  shallow!  Please expand considerably on this. In particular, explain why
+  figures 7 and 8 approximate the work of the database, and discuss the
+  results.  The section on performance also lacks a summary (beyond A < B < C).
+
+- page 36: the discussion on the challenges of provenance mentions 81 jars
+  studied (i.e. the industrial case study). Did you find other challenges
+  based on the debian data? This should be discussed (for instance, what
+  about the byte code transformations and the systematic recompilations
+  in debian? What is their impact here?).
+
+- page 37: there is additional anecdotal evidence of the usefulness of
+  provenance analysis here. Is it the right place for it?
+  Maybe it could be moved somewhere else.
+
+
+Minor comments, typos:
+- p 12, line 44: "the inclusion of 1" is unclear at first reading
+  (try "the inclusion distance of 1"?)
+
+- 16, 37: "a archive" -> "an archive"
+- 16, 44-45: "there were either there were"
+- 17, 11: Missing section number
+- 18, 44: ", 13 classes" -> "13 classes".
+- 19, 47: where -> when
+- 19, 47: exist -> exists
+- 21, 14: binaryi
+- 21, 27: looked to -> looked at
+
+
+All in all, I think this extension is a considerable extension of the
+original paper. The major things that still need to be addressed are to
+better connect this paper with its original version (documenting the
+changes, the differences between the original version of the evaluation
+and the replication), and to expand on a few unclear points. Finally,
+the performance part is a bit rushed and as a result, somewhat underwhelming.
+
+
+********
+
+Reviewer #2:
+---
+This paper describes a software library identification technique
+called Software Bertillonage that can be used to robustly ascertain the origins
+of a library included in an application. The technique works for languages with
+enough metadata in their compiled library files to read out the public
+identifiers from the source code. The authors have created Bertillonage
+signatures for a large number of libraries in Maven2, a popular Java library
+repository. By comparing an unknown library with these signatures, one can
+determine the identity of the library and in many cases its particular version.
+
+This paper is written very clearly. It motivates the technique both in
+real-world scenarios (contemporary and historical), and by comparing it
+against byte-by-byte hashing techniques (which are good at exact match,
+but not so good at non-exact matches) to show its increased utility.
+The technique itself is a fairly simple exercise in counting, but the
+authors provide advice on several "gotchas" that affect the similarity
+metric in ways that are due to relaxation of the syntactic language
+requirements for correct programs. The authors tested the technique
+in three main studies, one looking at a corpus of 1000 jars from Maven2,
+one at 945 jars from a Debian distribution, and the other looking at a
+small e-commerce industrial application with 81 jars.
+
+After reading this paper a few times, I would say the best way to improve
+it is to add a section in the Discussion speculating on how to put these
+techniques into real-world software tools. How would software engineers
+use this in an IDE? What would it look like for corporate security officers
+to use this technique to convince themselves that their software is compliant
+with all state and federal regulations? How about attorneys looking for
+software license violations to avoid embarrassing litigation (or enjoin a
+new lawsuit)? Consider how to engage users who don't have degrees in
+Computer Science.
+
+I think the paper needs only minor edits to make it suitable for publication.
+
+1. Page 2, line 23: "DLL Hell" needs no dash.
+
+2. Page 4, line 26: "best effort" should be "best-effort"
+
+3. Page 4, line 38 and 39: Data for replication should indicate that only the
+   data for the Debian study is provided. The data for Maven2 and the e-Commerce
+   application is not available at that URL.
+
+4. Page 8: line 23: Wouldn't class file obsfucation thwart Bertillonage?
+   Did you consider tree structure of method bodies as a way to increase
+   robustness?  I recall many of the source code plagiarism tools in
+   universities relying on structure to find people who alpha-renamed the
+   identifiers of other students' work.
+
+5. Page 8, line 40: Local variable names are also lost in Java class files.
+
+6. Page 10, line 20: Not only the CLASSPATH, but what was in the directories
+   in the CLASSPATH.
+
+7. Page 12, line 40: How would the technique work in cases where just the
+   license changed? Usually that's in a comment, which doesn't end up in the
+   binary. How would a person accused of using a library inappropriately w.r.t.
+   the license be able to defend himself with Bertillonage? Do you think compilers
+   should become license and version-aware?
+
+8. Page 13, line 7: Table 1's font is too small by a lot.
+
+9. Page 13, line 27: Which version of bcel.jar were you, and asm.jar are you, using?
+
+10. Page 13, line 32: Please copy the dates of the Maven2 crawls from Page 32 to here.
+
+11. Page 14, line 27: The first sentence is confusing. you say "then we
+    ignore it."  Are you ignoring the class that extends Object, or
+    Object itself?
+
+12. Page 15, line 46: I suggest Section 5.4 be renumbered Section 6. it's big
+    enough and different enough to stand on its own.
+
+13. Page 16, line 35: Why do you think that servlet-api was used by so many
+    applications in your Maven sample set?
+
+14. Page 17, line 11: Missing section number.
+
+15. Page 17, line 6: How do you envision presenting this similarity metric
+    in a tool in an understandable way?
+
+16. Page 18, line 24: A useful tool would be to compute a diff of identifiers
+    in the top matches to help the user determine which one is the best answer.
+
+17. Page 18: How would you match generated code, like from a parser generator,
+    or Java-to-Javascript compiler?
+
+18. Page 18, line 41: Extra space after "bundle-".
+
+19. Page 20, line 24: Add a definition of the term "byte-oriented
+    fingerprinting" and a citation to something that explains the idea.
+
+20. Page 21, line 2: How long did it take to crawl Maven2 without them
+    getting upset at your overuse of their bandwidth?
+
+21. Page 21, line 18: Add a citation for the CWRG.
+
+22. Page 21, line 22: Why did it take 10 hours to upload 20GB of data?
+    That seems like a slow network link.
+
+23. Page 22, line 29: Change "we had to perform" to "we performed"
+
+24. Page 25, line 48: Capitalize Table 3.
+
+25. Page 26, line 11: Remove the comma after "#28"
+
+26. Page 27, line 25: Did you validate any of your bertillonage results
+    by decompiling the binaries and comparing the files by hand?
+
+27. Page 28, line 25: Please add the sums you speak of in the prose
+    (e.g. 527, 133, 383, 285, 455, and 107) into the Tables 2, 4, and 6.
+
+28. Page 31, line 7: The language in the last two sentences of this paragraph
+    overstates the likelihood that your technique works more performantly on
+    industrial applications. Please tone it down.
+
+29. Page 31, line 45: When speaking of the corpora, please state the numbers
+    of distinct source files and class files, since as is stated earlier,
+    there is excessive duplication in the corpora (1.65m distinct source files
+    and 2.43m distinct class files for a difference of 590000 instead of what
+    looks like 12 million). By the way, since source files can produce many
+    target classes, can you state how many actual classes there were instead
+    of class files?
+
+30. Page 32, line 25: When you found mistakes in Maven2, did you let them know?
+    What happened?
+
+31. Page 32, line 31: Why did Maven's second snapshot have fewer exact duplicates?
+    What changed?  How many were added? How many were renamed?
+
+32. Page 33, Table 12: Please add another digit of precision to the timing numbers.
+    For numbers that small, it's better to report them in milliseconds.
+
+33. Page 33, line 41: How often would someone have to scan the complete Maven2
+    repository? Couldn't you do it once and put it up in the cloud?
+
+34. Page 34, Figure 8: The different "colors" are not visible in black and white,
+    and the shape differences are too subtle to see on 8.5 x 11 paper.
+
+35. Page 37, line 22: "a-typically" should be "atypically".
+
+
+
+********
+
+Reviewer #3:
+---
+The paper presents a lightweight technology for matching a class
+from a project, with another candidate from a library. This can be
+very useful for project management and licensing, and the work is
+well motivated.
+
+The setup and scale of validation is appropriate. The only concern
+I have is about the use of "binary fingerprint match" to avoid creating
+"ground truth"--I do not quite understand the rationale behind this
+decision, and further clarification in the final version would be useful.
+
+

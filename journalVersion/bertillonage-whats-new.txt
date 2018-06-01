@@ -1,0 +1,53 @@
+
+------------------------------------------
+
+Our 2011 "Journal of Empirical Software Engineering" submission
+differs from the MSR-2011 paper in the following ways:
+
+---
+Changes to the paper:
+---
+
+- Formatting the original MSR paper according to Journal of Empirical
+  Software Engineering's style resulted in a 23 page document.  When
+  we submitted, our document contained 40 pages, a 70% increase.
+
+- Section 4, Method, adds a new set-comparison measure:  Containment.
+
+- Section 5, Implementation, adds 4 pages to conduct an exploration of
+  Maven based on 1,000 randomly selected jars inside the Maven2
+  repository.
+
+- Section 6, Evaluation, is completely rewritten, since our experiment
+  now looks at 945 Debian jars instead of the previous small case
+  study of industry jars.  The original 5 pages have been removed and
+  replaced with 14 new pages of evaluation.
+
+
+
+---
+Changes to the underlying tools, data, and experiment:
+---
+
+- We now use SHA1 matches as a naive baseline approach for determining
+  provenance. We didn't really have a baseline technique in the
+  MSR-2011 paper to compare our techniques against.
+
+- Our bin2bin and bin2src tools now include fields and inner-classes
+  in the signatures.  We also fully process generics, enums,
+  interfaces, abstract classes, native methods, and some additional
+  java keywords we didn't even know about before (e.g. strictfp).
+  The MSR-2011 paper could only handle top-level classes and methods.
+  Generics, enums, interfaces, etc, were explicitly ignored.
+
+- Maven is bigger now:  275 GB vs. 150 GB.
+
+- We have 945 Jars from Debian, and we have a reasonable idea of ground
+  truth about these jars, since Debian maintainers record name and
+  version information about these jars in the package meta-data.
+
+- MSR-2011 used a source parser that Julius wrote from scratch, and
+  it had some bugs.  Now we use Java's own 'javac' compiler.  We also
+  switched the bytecode analyzer from [bcel.jar] to [asm.jar].
+
+

@@ -1,0 +1,110 @@
+\newpage
+\TOCadd{Abstract}
+
+\noindent \textbf{Supervisory Committee}
+\tpbreak
+\panel
+
+\begin{center}
+\textbf{ABSTRACT}
+\end{center}
+
+
+% MWG's 2nd attempt at an abstract (Jan 27, 2011):
+Deployed software systems are typically composed of many pieces, not all of
+which may have been created by the main development team.  Often, the
+provenance of included components --- such as external libraries or cloned
+source code --- is not clearly stated, and this uncertainty can introduce
+technical and ethical concerns that make it difficult for system
+owners and other stakeholders to manage their software assets.
+In this work, we motivate
+the need for the recovery of the provenance of software entities
+by a broad
+set of techniques that could include signature matching, source code fact
+extraction, software clone detection, call flow graph matching, string
+matching, historical analyses, and other techniques.
+We liken our provenance goals to
+that of Bertillonage, a simple and approximate forensic analysis technique
+based on bio-metrics that was developed in $19^{th}$ century France before
+the advent of fingerprints.  As an example, we have developed a fast,
+simple, and approximate technique called \emph{anchored signature matching}
+for identifying the source origin of binary libraries within a given Java
+application.  This technique involves a type of structured signature
+matching performed against a database of candidates drawn from the Maven2
+repository, a 275GB collection of open source Java libraries.
+To show the approach is both valid and effective, we conduct
+an empirical study on 945 jars from the Debian GNU/Linux distribution,
+as well as an industrial case study on 81 jars from an e-commerce
+application.
+
+
+
+% Kent Beck's 4-sentence abstract algorithm:
+%
+% http://plg.uwaterloo.ca/~migod/research/beckOOPSLA.html
+%
+%
+% 1. The first states the problem.
+% 2. The second states why the problem is a problem.
+% 3. The third is my startling sentence.
+% 4. The fourth states the implication of my startling sentence.
+
+% JWD's attempt at an abstract:
+
+% 1. The first states the problem.
+%Deployed software systems are typically composed of many pieces, not all of
+%which may have been created by the main development team.  Often, the
+%provenance of included components --- which may include external libraries
+%or cloned source code --- is not clearly stated.
+
+% 2. The second states why the problem is a problem.
+%This makes it difficult for developers to
+%manage and maintain their software assets.  Unfortunately,
+%existing techniques for discovering provenance, while exact, tend to be expensive
+%and of limited use.
+
+% 3. The third is my startling sentence.
+%In this work we propose a new framework for provenance:
+%software Bertillonage.  Our framework takes as inspiration a
+%French forensic technique developed in the 19th century,
+%before the advent of fingerprints.
+
+% 4. The fourth states the implication of my startling sentence.
+%A case study of a proprietary e-commerce Java application
+%tested the feasibility of our Bertillonage approach.  By matching class
+%signatures against signatures in the Maven2 central repository --- a 150GB
+%collection of open source Java libraries --- we disinterred valuable provenance information.
+%Our technique, while approximate, proved itself to be simple and surprisingly fruitful.
+
+
+% old abstract:
+%
+%Deployed software systems are typically composed of many pieces, not all of
+%which may have been created by the main development team.  Often, the
+%provenance of included components --- which may include external libraries
+%or cloned source code --- is not clearly stated.  This raises a number of
+%both technical and ethical/legal concerns.  Technically, it is often hard
+%to maintain such a system if its external dependencies are not well
+%documented.  Ethically, code fragments that have been copied from other
+%sources, such as open source software, may not have licences that are
+%compatible with the released system.  In this work, we motivate the need
+%for recovery of the provenance of software entities by a broad set of
+%techniques that include source code fact extraction, software clone
+%detection, call flow graph matching, string matching, and historical
+%analyses.  We liken our goals to that of Bertillonage, a simple and
+%approximate forensic analysis technique based on bio-metrics that was
+%developed in France before the advent of fingerprints.
+%
+%As a motivating example of this kind of work, we consider the PCI DSS
+%security standard for e-commerce, which requires that an application should
+%provide precise version information about any libraries that are packaged
+%with it.  In practice, this information is often not provided and so we
+%have sought ways to infer it from available evidence.
+%
+%We used a single Bertillonage metric of own invention, anchored signature matching,
+%to analyze Java libraries from a proprietary e-commerce Java application.
+%The application of this single metric allowed us to automatically provide exact
+%version information for over 57\% of our sample set, and to narrow the search
+%space significantly for another 39\%, providing actionable information on
+%96\% of the libraries within the e-commerce application.
+%

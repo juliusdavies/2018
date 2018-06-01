@@ -1,0 +1,211 @@
+VERY IMPORTANT INFORMATION (please read carefully)
+
+1. The final camera-ready paper is due on *March 25, 2011*. This deadline is firm
+--- if you miss the deadline, your paper will not appear in the proceedings. Next
+week you will receive instructions by Conference Publishing
+(info@conference-publishing.com) on how to submit the CRC.
+
+2. The format specifications of the camera-ready version of your paper are the same
+as were required for your initial paper submission (ACM SIG Proceedings Format, Two
+Column Format). Your paper must not exceed ten pages, including all figures and
+references.
+
+3. Registration. At least one author must register to attend the MSR conference by
+*April 15*. If no author registers by this deadline, your paper will not appear in
+the proceedings. To register for the conference, please go to the ICSE web-site. The
+registration for the MSR conference includes a dinner on the first day of the
+conference.
+
+http://2011.icse-conferences.org/registration
+
+4. (only for short papers) We will not have a poster session at the conference,
+instead accepted short papers will get a short presentation slot during the
+conference.
+
+5. This year, MSR has teamed with the PROMISE conference to manage storage of data
+from MSR 2011 papers. If you are able to so, we strongly encourage you to submit the
+data associated with your accepted paper to the PROMISE repository of reproducible
+SE experiments. 
+
+By storing your data in a publicly accessible location, your papers will get cited
+more (since they will be the origin of a line of research based around your data). 
+
+Also, by interacting with other researchers using your data, you may discover ways
+to enhance your analysis method (perhaps resulting in more publications, or novel
+grant opportunities, in the future). 
+
+For information on how to donate data to PROMISE, see "How to donate data" at
+http://promisedata.org/?cat=11
+
+6. Finally, join our Facebook event and invite friends and colleagues to participate
+in MSR. Or follow @msrconf on Twitter and tweet about the acceptance of your MSR
+paper (include the MSR tag #msrconf).
+
+http://www.facebook.com/event.php?eid=129938843737490 
+http://twitter.com/msrconf
+
+We want to congratulate you on your paper acceptance. We look forward to seeing you
+at the conference in Honolulu. Aloha! 
+
+Sincerely,
+
+Tao Xie and Tom Zimmermann
+MSR PC Co-chairs.
+
+Arie van Deursen
+MSR General Chair.
+
+
+---------------------------- REVIEW 1 --------------------------
+PAPER: 1
+TITLE: Software Bertillonage: Finding the Provenance of an Entity
+   
+
+This paper defines a software provenance problem --- identifying the origin of a
+software component in terms of its name and version number, describes a solution
+that relies on signature matching, and presents an empirical evaluation of this
+technique on maven project repository data. The proposed approach extracts a set of
+method headers in each component and compares their signatures pairwise between two
+components in terms of intersection set count. 
+
+Points in favor 
++ It addresses an important problem in industry. In particular, the scenario
+described in Section 6 is very realistic, strongly motivating the approach and the
+problem. I like that this paper intends to expand the scope of MSR beyond source
+code fragment analysis or version history analysis by dealing with binary components
+across multiple versions. 
++ The analogy between Bertillonage criminology and software fingerprinting is
+effective to convey the idea. 
++ The fingerprint method is intuitive, has a low computation cost, and can be
+applied easily to binary components. 
+
+Points against 
+- Though the paper intends to clarify the relationship between an origin analysis
+and a provenance analysis in Section 2, it is not clear how the origin analysis
+problem is inherently different from the provenance problem. The idea of software
+fingerprinting for an origin analysis has been around for a while (Demeyer et al.
+2000). Is it an issue of granularity (for example instead of identifying the origin
+of individual methods, identifying the origin of the entire source / binary
+component across applications)? Is it an issue of scalability? What is the scope of
+applications being compared against? 
+- The proposed technique is intuitive, a low cost solution, and yet I wonder how we
+know this is a good solution and what other alternatives are there.  
+- What are the applications that can really use the provenance information?  Other
+than the case of detecting licenses for a component, are there occasions where such
+coarse grained provenance information are really needed?
+- The ground truth set used for evaluation: How can one define ground truth for the
+provenance problem? Or is it just heuristics? How reliable is the maven repository
+data? Are they constructed and inspected by developers or are they automatically
+pulled from Maven configuration files?  Furthermore, the library version under focus
+may have been labeled a wrong name---for example, the experimenter thought
+jaxws-api.2.1.3.jar is a truly 2.1 version but a developer may have gave a wrong
+name to a X2.1.3.jar. It would have been nice to see a complementary method of
+ensuring the ground truth to look at its own build configuration file, README files,
+release notes, etc. As another example, how about the case where APIs keep its name
+and signature but the content of method bodies does change? 
+
+
+
+---------------------------- REVIEW 2 --------------------------
+PAPER: 1
+TITLE: Software Bertillonage: Finding the Provenance of an Entity
+   
+
+The paper presents a technique to determine the provenance of 
+an entity among a large code base. Motivations for determining 
+the provenance of an entity include determining the exact version of 
+a library that a given application is using, for licensing purposes, 
+to ensure that the latest version is being used, or to assess the 
+difficulty of upgrading to the latest version. The technique computes 
+the similarity of two entities based on a signature of each entity 
+and the classes that compose it. The technique is general, but is 
+applied to the case of Java systems and their particularities, such as 
+the need to develop a technique that works on both compiled and source 
+code, and that handles special cases such as source archives being 
+larger than compiled archives (for instance if unit tests are left out).
+The technique is validated on the set of 84 libraries that are used by 
+a commercial system, which are matched with the 130,000 libraries 
+and versions present in the Maven repository.
+
+The paper presents a concrete and well-detailed solution to an 
+important problem, which sprang from a practical need the authors 
+encountered. As a trend in MSR research is to analyze larger 
+collections of software systems, such techniques are building blocks 
+that other approaches can use. The way the similarity between entities 
+is computed is described well enough that other researchers can 
+reproduce it with ease. The evaluation, if done on a single system 
+only, was nevertheless convincing: most of the cases where the 
+approach were unsuccessful could be traced back to missing information 
+in the corpus. Of course, it stands to reason that evaluating the 
+approach on other systems would be a valuable extension to the present
+paper.
+
+I would have liked more details in some aspects of the evaluation
+however. In particular, the matches where the similarity was between 
+0 and 1 are glossed over (2 sentences!) in the current version of the
+paper. I would like more explanations on why the system did not perform 
+as well on these cases; can this also be attributed to faults in the 
+corpus? 
+
+Another part where I would have liked more data is on the performance 
+aspect of the technique. As the amount of data analyzed starts to become
+impractical (150GB), these considerations become more and more important. 
+As such, having figures on the amount of time that is expected for 
+determining the provenance of an entity, using a regular computer, would 
+be welcome. The lack of it is especially striking, since the abstract 
+mentions that the technique is "fast". Yet, at no point in the paper 
+did the author back that claim. It might be difficult to add that to 
+the paper at that stage, but I certainly hope this point to be addressed
+in the authors' further work.
+
+As a last comment, I found that the paper read well overall, with the
+exception of the discussion, which could use some restructuring. 
+
+
+
+---------------------------- REVIEW 3 --------------------------
+PAPER: 1
+TITLE: Software Bertillonage: Finding the Provenance of an Entity
+   
+
+This well-written paper presents a class/method type-signature-based
+method of reducing the space of potential matches of Java binary
+bundles (jar files) or source code. Authors take care to extract
+signatures that are likely to be similar for the source code and the
+corresponding binaries and define the similarity of two bundles of
+software via the fraction of common signatures and via the fraction of
+signatures that are also in another bundle (inclusion). The case
+study of a commercial project shows that the approach discovers
+unique original versions in the Maven2 repository in more than half of
+the instances.
+
+I think the need to determine the origins of source and binaries is a
+real and important problem. The case study is well done and
+explained. The value of the contribution is, perhaps, more in the
+description of what happens if one actually tries to determine the
+origins, as the method itself is relatively straightforward. 
+
+Some of the weaknesses are the single case study and the use of a
+single, albeit large repository. Obviously, it is limited to Java,
+yet that is perhaps a sufficiently large domain to develop specialized
+approaches. 
+
+Minor comments:
+
+Together with many other useful details, it would be good if the authors
+could quantify the extent to which their approximation was used in
+the data sample of Maven. In particular, how many of the class
+files used inner classes, generics, or annotations? 
+
+I think some of the related work of looking at the ways of finding
+origins of source code might be relevant, e.g, the question of source code
+authorship [1], or the question of the spread of innovation via code
+reuse [2].
+
+[1] Hung-Fu Chang and Audris Mockus. Constructing universal version
+history. In ICSE'06 Workshop on Mining Software Repositories, pages
+76-79, Shanghai, China, May 22-23 2006.
+
+[2] Audris Mockus. Large-scale code reuse in open source
+software. In ICSE'07 Intl. Workshop on Emerging Trends in FLOSS
+Research and Development, Minneapolis, Minnesota, May 21 2007. 

@@ -1,0 +1,316 @@
+
+
+%   We tried running our analysis against Google's android.jar, a jar not currently contained
+%   in the Maven2 repository). Our method decided
+%   it must come from Sun/Oracle's jdk sources (jdk-6u20-ea-src-b02-jrl-01\_apr\_2010.zip)
+%   with 221 matches.
+%   Together with the cayenne-1.2.2.jar results in Table \ref{tab:falseMatch},
+%   this shows how our method becomes confused by large clone imports,
+%   since these cause a spike in secondary matches, potentially eclipsing the primary
+%   matches.  In addition, there is no way for our method to reliably distinguish
+%   between primary and secondary matches.  For all our method knows, cayenne-1.2.2 is
+%   the canonical location for the commons-collections-3.1 classes, and not the other
+%   way around.
+
+%   But this confusion also has its uses:  Apache HttpClient developers recently
+%   wanted to know what version of their libraries Google had statically imported
+%   into the android.jar file.  By querying android.jar in our index we were
+%   able to provide specific version information concerning two libraries published
+%   by the Apache HttpClient team:  httpcore-4.0-beta2.jar, and httpclient-4.0-beta1.jar.
+%   See Table \ref{tab:android} to see how these were identified.  The main HttpClient
+%   developer asked if we could also test against httpclient-4\_0\_API\_FREEZE.jar,
+%   an uncommon version he suspected Google had actually imported.  We loaded
+%   httpclient-4\_0\_API\_FREEZE.jar into our index and re-ran the query with android.jar.
+%   The match-count was the same, but the earlier zip-date caused our method to pick this,
+%   certainly not contradicting the main developer's suspicion.  In this way our tool
+%   serves as a useful clone detection engine, especially for static imports.
+
+
+% ------Ties and License Resolution---------
+%   One interesting
+%   possibility arises when considering ties in conjunction with license requirements:  when an integrator
+%   notices they have a license incompatibility, ties may offer potential avenues for resolution.
+%   For example, suppose an integrator is initially considering the ApacheV1 commons-codec-1.1.jar, but
+%   then realizes they need a GPL-compatible license.  In this case a tie with an ApacheV2 commons-codec-1.2.jar
+%   might suggest a good upgrade path for the integrator to satisfy their licensing requirements,
+%   since the tie implies the more suitably licensed commons-codec-1.2 is also a reverse-compatible library,
+%   thanks to its matching signatures.
+
+
+
+%\begin{table*}
+%  \centering
+%  \caption{Discussion - What version of Apache httpclient is inside android.jar?}
+%  \begin{tabular}[htbp]{llr|llr}
+%\textbf{Matched binaries}        & \textbf{Zip Timestamp}  & \textbf{Matches}  & \textbf{Matched binaries}             & \textbf{Zip Timestamp}  & \textbf{Matches}  \\
+%\hline
+%\hline
+% httpcore-4.1-alpha1.jar         & 2009-Sep-06  &  84  &  httpclient-4.1-alpha1.jar       & 2009-Dec-10  & 110  \\
+% httpcore-4.0.1.jar              & 2009-Jun-19  &  87  &   httpclient-4.0.1.jar            & 2009-Dec-10   & 117  \\
+% httpcore-4.0.jar                & 2009-Feb-20  &  87  &   httpclient-4.0.jar              & 2009-Aug-07  & 119  \\
+% httpcore-4.0-beta3.jar          & 2008-Oct-15   &  88  &   httpclient-4.0-beta2.jar        & 2008-Dec-18  & 125  \\
+% \textbf{httpcore-4.0-beta2.jar} & \textbf{2008-Jun-18} &  \textbf{92}  &  httpclient-4.0-beta1.jar        & 2008-Aug-23  & 127  \\
+% httpcore-4.0-beta1.jar          & 2008-Jan-21  &  88   &  \textbf{httpclient-4\_0\_API\_FREEZE.jar}   & \textbf{2008-Jul-24}  & \textbf{127}  \\
+% httpcore-4.0-alpha6.jar         & 2007-Oct-05  &  65   &  httpclient-4.0-alpha2.jar       & 2007-Nov-06   &  53  \\
+% httpcore-4.0-alpha5.jar         & 2007-Jun-28   &  35  &  httpclient-4.0-alpha3.jar       & 2008-Feb-21   &  67  \\
+% jakarta-httpcore-4.0-alpha4.jar & 2007-Apr-23   &  31  &  httpclient-4.0-alpha4.jar       & 2008-May-05  &  83  \\
+% jakarta-httpcore-4.0-alpha3.jar & 2006-Dec-07   &  26  & httpclient-4.0-alpha1.jar       & 2007-Jul-15  &  31  \\
+% jakarta-httpcore-4.0-alpha2.jar & 2006-Jun-08  &  23   & & & \\
+% jakarta-httpcore-4.0-alpha1.jar & 2006-Apr-16   &  21  & & & \\
+%\hline
+%  \end{tabular}
+%  \label{tab:android}
+%\end{table*}
+
+
+
+\subsection{Threats to Validity{\label{sec:threats}}}
+
+This section discusses the main threats to validity that can affect the
+studies we performed. 
+
+In particular, threats to {\em construct validity} may concern imprecision
+in the measurements we performed. Our logic for detecting Java and class
+files in the Maven2 repository relied on accurate detection of
+\mytt{.java} and \mytt{.class} files, as well as \mytt{.jar},
+\mytt{.ear}, \mytt{.war}, 
+\mytt{.zip}, \mytt{.tar.gz}, \mytt{.tar.bz2}, and \mytt{.tgz}
+archives.  No other search patterns were employed, and thus some archives
+may have been missed.  This threat is diminished thanks to the very large
+amount of data we managed to extract from just those nine search patterns.
+
+%Our subsequent logic for extracting the class signatures could be faulty,
+%in particular our Java source parser.  We are less concerned about faults
+%in our bytecode analysis, since the \mytt{bce-5.2.jar} tool we used is 4
+%years old, very popular, and very well tested.  Bearing in mind that our
+%Java source parser is potentially a problem, we believe our results
+%nonetheless resemble exactly the shape one would expect for a
+%class-signature-index approach, with matches resembling a bell curve that
+%drops off as version-numbers diverge from the exact match.  In addition,
+%queries involving only bytecode (e.g., queries for bytecode using bytecode)
+%resulted in a similar bell curve, alleviating concerns over our source
+%parser. We also do not address malicious or intentionally deceptive
+%provenance issues.
+
+Threats to {\em internal validity} arise primarily from our technique for
+verifying a correct match: we visually check the version number in the
+names of jars and zip files.  To address this threat, we samples 945 jars
+with known provenance information from Debian, and we also conducted a
+thorough byte-by-byte comparison of all our jars.
+%We only conducted a thorough byte-by-byte
+%comparison in cases where the initial visual check failed.
+%RQ3 in particular
+%makes the threat clear: are version numbers in jar files at all
+%reliable?  
+One threat to internal validity is that we rely on authoritative file-names
+instead of other information like tags found in version control systems
+(VCSs).
+%According to current
+%tradition in software development the ultimate authority on version is the tag in the version control
+%system (VCS).  
+%We did not try to address this weakness empirically by comparing tagged VCS code
+%against published jars and zips, and such a study would be highly valued here.
+%We showed that even in the Maven2 repositories there were
+%mislabelings,  but to a lesser extent than the case-study projects.
+We hypothesize that developers involved in the creation and/or packaging of
+open source libraries for Debian and for the Maven2 repository strive to
+publish correct version information, since dependency management systems
+rely on such information.
+
+
+Threats to {\em external validity} concern the generalization of our results.
+%We provide a single case study involving a proprietary enterprise application,
+%and us such, our study shows feasibility rather than generalizability.
+Our sample of 945 Debian jars attempts to minimize this threat, but the
+Debian collection may be atypical, for example, most Java developers choose
+to develop and deploy applications to the Windows platform.  Could the
+Debian sample be missing jars that are more popular on Windows?  We believe
+the large size of our Debian sample mitigates this threat.  We postulate
+there is a strong tradition of platform-independent development within the
+Java community.  Such a tradition, if it exists, would further lessen the
+risk of any significant body of Windows-specific or Mac-specific Java
+archives being missed by our sample.  Another threat to our external
+validity comes from Maven's own composition:  is Maven's repository a good
+sample of open source software in the Java eco-system?  Given its critical
+position in industry with respect to Java dependency resolution (even
+unrelated dependency resolvers such as Ivy use the Maven2 repository), we
+believe it is representative.  We have one complaint about its composition:
+it contains too many alpha, beta, milestone, and release-candidate
+artifacts that are likely of little interest to integrators.
+%In future studies we may consider filtering these out.
+%We control some of the over-reprentation by enforcing a unique index
+%in our database for each Java/class file.
+%In this way many popular jars such as \mytt{ow2-util-scan-impl-1.0.18.jar} appear only once in our database,
+%despite 113 occurences scattered throughout the Maven2 repository.
+
+\section{Discussion{\label{sec:discussion}}}
+
+%[cite the OOPSLA-2009 Onward! harvard paper....]
+
+What is provenance?   Is \emph{name} and \emph{release number} alone a
+suitable representation of provenance for our purposes?  Suppose a given
+jar is authoritatively known to be named \emph{foo} and to be release
+\emph{x.y.z}.  Our method assigned the highest similarity score to this
+single candidate, \emph{foo-x.y.z.jar}, for over $60\%$ of the subject jars
+in our case study.  But can provenance really be boiled down to a small
+sequence of characters, hyphens, digits and dots.  Does \emph{foo-1.2.3}
+constitute provenance?  This question is important, since our technique
+assumes it.
+
+Fortunately, for the majority of the jars in this study, and perhaps for
+the majority in ``current circulation'' among Java developers, this notion
+of provenance is sufficient.  As a thought experiement, imagine asking
+random undergraduate students enrolled in \emph{Introduction to Computer
+Programming} at any university to download the \mytt{oro-2.0.8.jar} Java
+library.  In all likelihood the vast majority would download the same
+artifact, even those completely unfamiliar with Java.  Java developers
+often manage to avoid name and version collisions among their reusable
+libraries.
+
+However, for some jars, this notion of provenance is insufficient.  The
+underlying assumption with respect to \emph{name} and \emph{release number}
+is that the combination of these two attributes will always result in a
+distinct set of software code, an \emph{authoritative} snapshot, frozen in
+time.  Among the $81$ jars studied, we observed three challenges to a
+\emph{foo-1.2.3} notion of provenance:
+
+\begin{enumerate}
+
+\item Jars that, during their build process, copy classes from other jars.
+    For example, \mytt{vreports.jar} contains copies of classes from
+    \mytt{itext.jar}.
+
+\item Jars with historically unstable provenance, perhaps due to corporate
+    acquisitions, or even internal restructurings within a company.  The
+    Sun/Oracle jar named \mytt{xsdlib.jar} is an example of this.  Various
+    project websites provide conflicting testimony regarding the jar's
+    origins.
+%\begin{itemize}
+%\item Java Architecture for XML Binding (JAXB)
+%\item Java API for XML-Based RPC (JAX-RPC)
+%\item Java API for XML Registries (JAXR)
+%\item Java Web Services Developer Pack (JWSDP)
+%\item Java-ws-xml
+%\item Sun Multi-Schema Validators
+%\item Project Glassfish
+%\end{itemize}
+    Each of these projects appears to have taken control of, or at least
+    contributed to, \mytt{xsdlib.jar}'s development at some point in its
+    history.  The answer may very well be a combination of the projects we
+    observed, which each project contributing to different phases of
+    \mytt{xsdlib.jar}'s evolution.  In cases such as these, our
+    Bertillonage results can resemble a hall of mirrors.  More expensive
+    analysis methods, such as sending questions to project mailing lists,
+    or analyzing version control repositories are required.
+
+\item Altered jars, e.g., a particular \mytt{foo-1.2.3.jar}, may contain
+    $10$ classes, whereas another jar with the same name and release
+    information may contain only $9$ classes.  In some cases these $9$ are
+    a proper subset of the $10$.  Perhaps a user of the library has
+    customized it by adding or removing a class.  Which archive is
+    authoritative in this case?  We have examples of this in our data.
+
+\end{enumerate}
+
+In the face of these challenges our Bertillonage approach was surprisingly
+fruitful.  Our simple Bertillonage metric could readily accommodate \#1
+(emcompassed jars).  Challenges \#2 (unstable provenance) and \#3 (altered
+jars) always required additional narrowing work, and yet our approach
+nonetheless still revealed when these particular challenges were occurring.
+Rather than reinforce our initially narrow notions of provenance, thanks to
+the simplicity of our metric, and particularly thanks to an immense (and
+messy) data source such as Maven2, our study outlined what future
+provenance research must tackle.
+
+\subsection{A Foundation for Higher Analyses}
+
+Developing, deploying, and maintaining software systems can involve many
+diverse groups within --- and external to --- an organization.  Each of these
+groups may require different knowledge about the software systems they are
+involved with.  For example, testers, developers, system administrators,
+salespeople, managers, executives, auditors, owners, and other stakeholders
+may have specific questions they need answered about an organization's
+software assets.  A salesperson may have a technically demanding client
+that insists on a specific release of a particular library.  The security
+auditor wants to make sure no libraries or copy-pasted code fragments
+contain known security holes.  The license auditor wants to know if her
+license requirements are being fulfilled.  The manager wants to know how
+risky an upgrade to the latest release of a popular object-relational
+database mapping library might be.  As noted in
+section~\ref{sec:evaluation}, provenance forms a critical foundation upon
+which these higher level analyses rely.  Without reliable provenance
+information in place these stakeholders cannot even begin to find answers
+to their questions.
+
+
+Provenance information is also important to the software developers
+responsible for importing and integrating libraries and code fragments into
+their software systems.  Therefore name and release information is often
+encoded directly into an artifact's file name (e.g., \mytt{oro-2.0.7.jar}).
+But sometimes developers may omit the release numbering, or they may
+mistype it.  Also, as we noted earlier, in some cases an artifact
+internally encompasses additional artifacts, rendering the file name
+inadequate for communicating the versions of the encompassed releases.  For
+these reasons, higher level analyses cannot depend on filename alone.
+
+The specific metric we introduced here, anchored signature matching, will
+by no means be the final word on software Bertillonage.  But we found our
+simple metric to be effective.  For the 945 Debian jars, arguably
+an atypically challenging dataset, our approach was able to supply high quality provenance
+information for over $75\%$ of the subject archives, including complex
+cases where an archive encompassed other archives.  Of course some manual
+effort was required in our case study to narrow all matched candidates to
+single exact matches,
+%\footnote{Some
+%high level analyses can tolerate a range of matches, e.g., a software license might
+%remain constant across several versions of a library.},
+but the original filename was correct for the majority of these, and so the
+manual effort was minimal.  Our result minimizes the risk of relying on
+filenames exclusively when performing higher level analyses that depend on
+provenance.  We also note the excellent binary-to-binary results we
+obtained can serve as a bridge to improved binary-to-source results:  with
+a single binary match, manually locating the corresponding source archive
+(especially in the open source world) is trivial.  This ``bridging'' idea
+mitigates the downside of our inferior binary-to-source results.
+
+Our technique also performed well in a separate informal exercise to
+determine the moment of a copy-paste of class files.  We noticed the
+developers of \mytt{httpclient.jar}, an open source Java library, had posed
+a question on their mailing list: when did Google Android developers
+copy-paste \mytt{httpclient.jar} classes into
+\mytt{android.jar}?\footnote{See email from Bob Lee to dev@hc.apache.org on
+18 Mar 2010 23:47:14 GMT, subject "Re: HttpClient in Android."} They wanted
+to know this to evaluate how hard it would be for Google to import a more
+recent version of their jar.  We employed our technique to answer the
+original question on the mailing list, and the main developer confirmed our
+result.  We initially identified \emph{4.0-beta1} as the moment of the
+copy-paste.  The developer asked if we could also test against
+\emph{4\_0\_API\_FREEZE}, an uncommon version he suspected Goo\-gle had
+actually imported.  We loaded the \emph{FREEZE} release into our index and
+re-ran our analysis.  This resulted in both \emph{4.0-beta1} and
+\emph{4\_0\_API\_FREEZE} being returned as equally likely matches for
+\mytt{android.jar}.
+
+We were successful in narrowing the search space for the moment of a
+copy-paste to just two versions.  In addition, the \mytt{httpclient.jar}
+exercise motivated future work. Precedent and subsequent releases diverge
+with respect to the cardinality of their intersecting signatures.  Our
+anchored signature match is not just useful for finding exact matches.  It
+could also prove useful at measuring the distance between versions, which
+in turn could be useful for performing risk assessment of releases.
+
+
+As stated earlier, we performed a license audit and security audit using
+the provenance information unearthed from the case study.  The results of
+these higher analyses proved useful: the license audit pinpointed a jar
+where some versions used the GNU Affero license, while other versions used
+LGPL; similarly, the security audit located a jar with a known security
+hole.  The organization found the results from both of these audits
+valuable, and steps were taken to address both issues in their application.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "000_main"
+%%% End: 
+

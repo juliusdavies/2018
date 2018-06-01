@@ -1,0 +1,237 @@
+%%%%%%%%%%%%%%%%%%%%%%% file template.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is a general template file for the LaTeX package SVJour3
+% for Springer journals.          Springer Heidelberg 2010/09/16
+%
+% Copy it to a new file with a new name and use it as the basis
+% for your article. Delete % signs as needed.
+%
+% This template includes a few options for different layouts and
+% content for various journals. Please consult a previous issue of
+% your journal as needed.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% First comes an example EPS file -- just ignore it and
+% proceed on the \documentclass line
+% your LaTeX will extract the file if required
+\begin{filecontents*}{example.eps}
+%!PS-Adobe-3.0 EPSF-3.0
+%%BoundingBox: 19 19 221 221
+%%CreationDate: Mon Sep 29 1997
+%%Creator: programmed by hand (JK)
+%%EndComments
+gsave
+newpath
+  20 20 moveto
+  20 220 lineto
+  220 220 lineto
+  220 20 lineto
+closepath
+2 setlinewidth
+gsave
+  .4 setgray fill
+grestore
+stroke
+grestore
+\end{filecontents*}
+%
+\RequirePackage{fix-cm}
+%
+%\documentclass{svjour3}                     % onecolumn (standard format)
+%\documentclass[smallcondensed]{svjour3}     % onecolumn (ditto)
+\documentclass[smallextended]{svjour3}       % onecolumn (second format)
+%\documentclass[twocolumn]{svjour3}          % twocolumn
+%
+
+\smartqed  % flush right qed marks, e.g. at end of proof
+%
+\usepackage[pdftex]{graphicx}
+%
+% \usepackage{mathptmx}      % use Times fonts if available on your TeX system
+%
+% insert here the call for the packages your document requires
+
+% makes "C++" take up a little less space; man, those plus signs are big
+\usepackage{relsize}
+\newcommand{\Cpp}{{C\raisebox{0.2ex}{\ensuremath{\mathsmaller{++}}}}\xspace}
+\usepackage{paralist}
+\usepackage{color}
+\usepackage{fancybox}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{fmtcount}
+\usepackage[margin=10pt,font=small,labelfont=bf,labelsep=endash]{caption}
+\usepackage{float}
+\usepackage{comment}
+\restylefloat{figure}
+
+\input{macro}
+
+\newenvironment{entry}%
+{\begin{list}{}{\noindent
+\renewcommand{\makelabel}[1]{\textbf{##1:}\hfil}%
+\setlength{\leftmargin}{1.5em}%
+\setlength{\itemindent}{1em}%
+}}%
+{\end{list}}
+
+\newenvironment{hassanbox}%
+{\vspace{1mm}\noindent\begin{Sbox}\begin{minipage}{0.97\columnwidth}}%
+{\end{minipage}\end{Sbox}\fbox{\TheSbox}}
+
+%% adds by migod
+\definecolor{darkgreen}{RGB}{0,128,0}
+\definecolor{darkblue}{RGB}{0,0,128}
+\definecolor{sienna}{rgb}{0.627451,0.321569,0.176471}
+\definecolor{forestgreen}{rgb}{0.133333,0.545098,0.133333}
+\definecolor{purple}{rgb}{0.627451,0.12549,0.941176}
+\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+\newcommand{\green}[1]{\textcolor{green}{#1}}
+\newcommand{\sienna}[1]{\textcolor{sienna}{#1}}
+\newcommand{\forestgreen}[1]{\textcolor{forestgreen}{#1}}
+\newcommand{\purple}[1]{\textcolor{purple}{#1}}
+\newcommand{\migod}[1]{\emph{\blue{Mike says: #1}}}
+\newcommand{\dmg}[1]{\emph{\red{Daniel says: #1}}}
+\newcommand{\abram}[1]{\emph{\forestgreen{Abram says: #1}}}
+\newcommand{\jad}[1]{\emph{\purple{Julius says: #1}}}
+
+\newcommand{\mytt}[1]{{\small \texttt{#1}\xspace}}
+
+%\newcommand{\rqOne}{How should we index our corpus of source and binary artifacts
+%to answer provenance queries?}
+
+%\newcommand{\rqTwo}{Does provenance require a perfect corpus?}
+
+%\newcommand{\rqThree}{Given an artifact in one form (e.g., binary), can we locate its complement (e.g., source)?}
+
+
+\newcommand{\rqOne}{How useful is the similarity index for narrowing the search space to find an original
+  \emph{binary} archive when provided a subject binary archive?}
+
+\newcommand{\rqTwo}{How useful is the similarity index for narrowing the search space to find an original
+  \emph{source} archive when provided a subject binary archive?}
+
+\newcommand{\rqThree}{How reliable is the version information
+stored in a jar file's name?}
+
+
+
+\newcommand{\gplNonDeclared}{ Source code is under the GPL, but the declared
+    license does not mention the GPL}
+\newcommand{\gplNotInCode}{ The declared license includes the GPL, while the source code does not}
+\newcommand{\gplIncompat}{ The declared license includes the GPL, however there is at least one file under an incompatible license}
+\newcommand{\gplMismatch}{ Mismatch of GPL version}
+
+\newcommand{\signature}[1]{\ensuremath{\sigma(#1)}}
+\newcommand{\querySurface}[1]{\ensuremath{\vartheta(#1)}}
+
+\newcommand{\signatureL}[1]{\ensuremath{\sigma_L(#1)}}
+\newcommand{\querySurfaceL}[1]{\ensuremath{\vartheta_L(#1)}}
+
+\newcommand{\signatureT}[1]{\ensuremath{\sigma_T(#1)}}
+\newcommand{\querySurfaceT}[1]{\ensuremath{\vartheta_T(#1)}}
+
+\DeclareCaptionType{copyrightbox}
+
+
+%
+% Insert the name of "your journal" with
+\journalname{Empirical Software Engineering}
+%
+\begin{document}
+
+%-- \title{Software Bertillonage: Finding the Provenance of an Entity}
+\title{Software Bertillonage
+}
+\subtitle{
+Determining the Provenance of Software Development Artifacts
+}
+
+
+%\subtitle{Do you have a subtitle?\\ If so, write it here}
+
+%\titlerunning{Short form of title}        % if too long for running head
+
+\author{
+Julius Davies \and
+Daniel M. German \and
+Michael W. Godfrey \and
+Abram Hindle
+}
+
+%\authorrunning{Short form of author list} % if too long for running head
+
+\institute{
+Julius Davies \at
+  Department of Computer Science, \\
+  University of Victoria, \\
+  Canada\\
+  \email{juliusd@uvic.ca}
+  \and
+Daniel M. German \at
+  Department of Computer Science, \\
+  University of Victoria, \\
+  Canada\\
+  \email{dmg@uvic.ca}
+  \and
+Michael W. Godfrey \at
+ David R. Cheriton School of Computer Science,\\
+ University of Waterloo,\\ 
+ Canada \\
+  \email{migod@uwaterloo.ca}
+\and
+Abram Hindle \at
+Department of Computing Sciences,\\
+University of Alberta,\\
+Canada\\
+\email{abram@softwareprocess.es}
+}
+
+\date{Received: 2011-Sep-05 / Accepted: 2012-Jan-26}
+% The correct dates will be entered by the editor
+
+
+\maketitle
+
+\begin{abstract}
+\input{001_abstract}
+
+% No need to include 'Bertillonage' as a keyword.
+% It's a rare word, and so the fact it's in our title
+% will cause it to dominate search results.
+
+\keywords{reuse, provenance, code evolution, code fingerprints}
+
+% \PACS{PACS code1 \and PACS code2 \and more}
+% \subclass{MSC code1 \and MSC code2 \and more}
+
+%\category{D.2.7}{Software Engineering}{Distribution, Maintenance, and Enhancement}
+%\terms{Management, Measurement}
+\end{abstract}
+
+\input{010_intro}
+\input{012_bertillonage}
+\input{020_background}
+\input{030_framework}
+\input{040_method}
+\input{050_implementation}
+\input{060_evaluation}
+\input{062_results}
+\input{070_discussion}
+\input{080_conclusion}
+
+
+% BibTeX users please use one of
+%\bibliographystyle{spbasic}      % basic style, author-year citations
+\bibliographystyle{spmpsci}      % mathematics and physical sciences
+%\bibliographystyle{spphys}       % APS-like style for physics
+%\bibliography{}   % name your BibTeX data base
+
+\bibliography{PURE}
+%\bibliography{07_bibliography}
+
+\end{document}
+% end of file template.tex
+

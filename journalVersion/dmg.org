@@ -1,0 +1,140 @@
+
+* DONE Daniel-001
+------------
+   Daniel, can you review this section?  Also, I think measures got confused!
+   
+   - pages 19 and 20: there is a summary which also includes a summary, making it
+     repetitive.
+
+My solution: reorder text, rephrase it a little bit.
+      
+
+* WAITING Daniel-002                                                 :WAITING:
+------------
+(For Daniel?  This one is fun! They could mix & match artifacts from various jar
+ files to create a jar with the license they need.  Presumably if the sig
+ is identical for a given class, it fulfills the desired functionality.)
+
+- Page 12, line 40: How would the technique work in cases where just the
+  license changed? Usually that's in a comment, which doesn't end up in the
+  binary. How would a person accused of using a library inappropriately w.r.t.
+  the license be able to defend himself with Bertillonage? Do you think compilers
+  should become license and version-aware?
+
+
+To Do in response to reviewers.
+
+As described in the introduction of the paper, Software License
+Compliance is one of the major potential uses of Bertillonage
+tools. The problems of software compliance are very complex, and
+involve many different aspects that go beyond Bertillonage, such as
+license identification and architectural analysis. To avoid confusing
+the readers, we have avoided discussing these licensing challenges.
+
+In the situation that the reviewer comments. the license of a file is
+usually embedded as a comment (as pointed out by the reviewer) or in
+other files (such as a COPYING) and will therefore be invisible to the
+Bertillonage tools that are run on binaries (since it is not in the
+binary).
+
+In the situation that a library changes its license from one version
+to another, with no other change in its source, our system will
+determine that both versions are a match.
+
+A license analysis system (which, to our knowledge, does not exist
+today) is likely to determine that the creator of the binary can
+choose to use one of the two licenses, whichever fits best its
+needs. However, if the choice is for the license of the older version,
+this could have important repercussions trying to upgrade to new
+versions of the library; at that point it will be necessary to do a
+new licensing analysis to determine if this is feasible.
+
+We absolutely agree that the compilers (and in general build systems)
+are perfectly position to do become a cornerstone of the software
+licensing compliance analysis. 
+
+One very simple step forward would be for compilers to embed the very
+first set of comments of every source used in the binary (where the
+copyright and licensing info is located). Developers could rely on these
+comments to pass information to the users of the binaries.
+
+Build systems have at hand the two critical pieces of information
+needed for licensing analysis (see above): the list of files used, and
+their architectural composition. Build systems will need "licensing
+awareness" including a "licensing requirements engine" that can
+determine the licensing of the binaries it creates. Also, they are
+perfectly positioned to create a "bill of materials" that clearly
+states what are the components and files that are used to create a
+binary, their origin, and their license.
+
+In fact, a recent organism is standardizing such information: the
+Software Package Data Exchange (SPDX). "The Software Package Data
+Exchange (SPDX) specification is a standard format for communicating
+the components, licenses and copyrights associated with a software
+package." (spdx.org, one of the authors is member of this
+committee). We expect that build systems will generate this
+information as part of their output. But to do so requires the
+building of corpus of pre-approved components, and software
+Bertillonage will be used to match the source being compiled to this
+repository.
+
+
+* DONE Daniel-003
+
+  - Page 13, line 7: Table 1's font is too small by a lot.
+  
+Fixed Changed to \footnote. It still fits nicely within the confines
+of the text
+
+* WAITING PROGRESS Daniel-004                                        :WAITING:
+------------
+- still on page 15, you mention the possibility of bytecode manipulators as a
+  potential problem. A quantification of the problem right here would be nice
+  (there is a bit of data on page 18 on that).
+
+- Page 18: How would you match generated code, like from a parser generator,
+  or Java-to-Javascript compiler?
+
+The code generator is likely to generate the a well-defined set of
+classes every time (plus many others based on the input). Our
+Bertillonage system would consider any output from these generators
+to be "copies" of each other. An improved Bertillonage system would
+have to flag the common classes created by a generator as special, and
+every time such copy is found, immediately marked its origin as known,
+without having to check every other jar for matches. In fact, we see
+this as the next step in Software Bertillonage: to create a curated
+corpus of artifacts whose provenance is well known. Any candidate will
+first be run against this corpus, and only if not match is found, run
+against a the universal corpus (such as the one described in this
+paper).
+
+
+- Page 8: line 23: Wouldn't class file obsfucation thwart Bertillonage? (YUP!)
+  Did you consider tree structure of method bodies as a way to increase
+  robustness?  I recall many of the source code plagiarism tools in
+  universities relying on structure to find people who alpha-renamed the
+  identifiers of other students' work.
+
+Class file obfuscation could thwart Bertillonage, but it depends on the
+method the obfuscation uses. Our method uses the type signature of its
+classes and methods (not its names), and it is likely to fail if the
+obfuscator changes them. But our method will continue to work if the
+obfuscation is only renaming identifiers and code reformatting. This is
+an interesting area of research, and we suspect it will become a
+mouse-and-cat game, where software Bertillonage tools will try to
+defeat obfuscators, and obfuscators will continue to improve so the
+former cannot defeat them.
+
+
+
+* Daniel-005
+------------
+We never updated 'Discussion' in the journal version, so it's stale.
+
+  page 36: the discussion on the challenges of provenance mentions 81 jars
+  studied (i.e. the industrial case study). Did you find other challenges
+  based on the debian data? This should be discussed (for instance, what
+  about the byte code transformations and the systematic recompilations
+  in debian? What is their impact here?).
+
+

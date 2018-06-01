@@ -1,0 +1,98 @@
+%\vspace{1mm}
+\section{Conclusion and Future Work{\label{sec:conclusion}}}
+
+In this paper, we have discussed the problem of determining the provenance
+of a software entity.  That is, given a library, file, function, or even
+snippet of code, we would like to be able to determine its origin:  was the
+entity designed to fit into the design of the system where it sits, or has
+it been borrowed or adapted from another entity elsewhere?  We argued that
+determining software entity provenance can be both difficult and expensive,
+given that the candidate set may be large, there may be multiple or even no
+true matches, and that the entities may have evolved in the mean time.
+Consequently, we introduced the general idea of software Bertillonage:
+fast, approximate techniques for narrowing a large search space down to a
+tractable set of likely suspects.
+
+As an example of software Bertillonage, we introduced \emph{anchored
+signature matching}, a method to determine the provenance of source code
+contained within Java archives.  We demonstrated the effectiveness of this
+simple and approximate technique by means of an empirical experiment
+performed on 945 jars from the Debian GNU/Linux distribution, and using a corpus drawn from
+the Maven2 Java library repository.  We found that we were able to reliably
+retrieve high-quality provenance information of contained binary Java archives
+if the product was present in our database derived from Maven2, and in the majority of cases we were
+able to identify the correct version.  If a sought product was not present
+in Maven, this was usually quickly obvious.  However, if a product was
+present we found that identifying the correct version was sometimes tricky,
+requiring detailed manual examination.  The use of anchored signature
+matching proved to be very effective in eliminating superficially similar
+non-matches, providing a small result set of candidates that could be
+evaluated in detail.
+
+Being able to determine the provenance of software entities is becoming
+increasingly important to software developers, IT managers, and the
+companies they work for. Often these stakeholders need this information  in
+order to comply with security standards, licensing and other requirements.
+Given the wide ranging nature of the problem, the large candidate sets that
+must be examined, and the detailed amount of analysis required to verify
+matches, we feel that this is only the beginning of software Bertillonage.
+We need to design a wide array of techniques to narrow the search space
+quickly and accurately, so that we can then perform more expensive analyses
+on candidate sets of tractable size.
+
+\subsection*{Acknowledgements{\label{sec:acknowledgements}}}
+
+We thank Dr. Anton Chuvakin of Security Warrior Consulting
+(www.chuvakin.org) for his advice on PCI DSS.
+
+
+% %  version-aware
+% % and license-aware code-search engine.  Unlike existing
+% % code-search engines that expect textual queries,
+% % ours is queried by uploading a full jar file.
+% % We were able to find source version matches
+% % to within a minor version or better
+% % over 68\% of the time
+% % in a sample of 250 random jar files.  By supplementing our Maven index
+% % with missing source files we were able to increase version matching to over 90\%
+% % in a sample of 35 jar files.
+
+%   In future work our definition of a class-signature could be altered to leave out the namespace
+%   (i.e., the `a.b.' in a.b.C from Listing \ref{lst:cSig}), since package is already
+%   available as a column in our database.   Clones are known to often have identical
+%   file names, but our current index unnecessarily forces clones to also have identical directory
+%   sub-trees (i.e., ./a/b/C.java) since Java name-spaces and directory trees are
+%   inseparably linked.  For our current study anchoring our clones in such a way helped us avoid
+%   the complexity of filtering results:  all detected clones were always positive matches.
+%   However, a looser signature definition could help us find more examples of copy-paste reuse.
+
+
+
+% The false candidates motivate
+% future improvements to our signature extraction.
+% We may be able to properly categorize more of the false candidates as low-confidence
+% matches by improving our signature extraction.  Future avenues for improvement include:
+
+% \begin{enumerate}
+
+% \item Inner classes are currently ignored.  Two of the false candidates above
+% would become low-confidence matches had we extracted signatures
+% from inner classes.
+
+% \item Java stores a string literal pool inside each class file.  This
+% could be particularly helpful since Java library release procedures often
+% include hard-coding the library's version as a string literal\footnote{
+% CVS and Subversion offer a keyword expansion feature that automatically
+% inserts a version-specific string literal directly into the source code.}.
+
+% \end{enumerate}
+
+% Improvements to the signature extraction would likely result in smaller
+% multiple-candidate sets as well, which in turn would lead to more
+% single-candidate results.
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "000_main"
+%%% End: 

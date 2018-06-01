@@ -1,0 +1,72 @@
+
+
+Goal of paper:
+"Do we have a good provenance technique here?"
+
+Additional message:
+"Bin2src is hard.  Look at these wonderful and weird things we saw that support this message."
+
+
+The message of bertillionage: you want to guarantee recall, at the expense of precision,
+because precision can be done with other methods better.
+
+We have a spectrum of approaches here:
+
+- sha1-of-jar
+- sha1-of-contents
+- JESE-2011 (more aggressive signatures)
+- MSR-2011 (less aggressive signatures)
+- MSR-2010 (DiPenta licensing of jars, signature is FQN and nothing else!)
+
+
+
+
+Daniel and I will rewrite sections 5. and 6.  Here is the current plan:
+
+
+5. Implementation
+
+5.1 Building a Corpus
+
+5.2 Extracting the Signatures
+
+5.3 Matching a Subject Artifact to Candidates
+
+5.4  [Internal maven-on-maven] can be part of 5
+so we don't pollute the paper with too many sections. and keep the results brief.
+This is what we expect, we match it, but look, the distribution of bin2src indexes is spread like this.
+and some quick reasons.
+so we can now proceed to real experiments.
+
+
+6. Evaluation
+
+RQ1:  how useful is bin2bin?
+
+RQ2:  how useful is bin2src?
+
+6.1 Setting
+
+6.2 Results
+
+
+6.2.1 Baseline:  Debian
+
+sha1-jar-granularity  (ha!  2 matches of 964)
+sha1-class-granularity 
+bertillonage bin2bin
+bertillonage bin2src
+
+
+6.2.2 Industry Case Study (the Bank)
+
+sha1-jar-granularity
+sha1-class-granularity 
+bertillonage bin2bin
+bertillonage bin2src
+
+
+
+
+
+

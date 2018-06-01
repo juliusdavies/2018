@@ -1,0 +1,108 @@
+\section{Related Work{\label{sec:background}}}
+
+In software engineering research, similar questions relating to development
+artifact provenance and attribution have been addressed in various guises.
+For example, there is a large body of work in software clone detection that
+asks the question: which software entities have been copied (and possibly
+tweaked) from other software entities.  Our own work~\cite{Godfrey2005tse}
+on the problem of ``origin analysis'' asked: if function $f$ is in the new
+version of the system but not the old, is it really a new function or was
+it merely moved / renamed / merged or split from another entity in the old
+version?  The emphasis in our work here is to broaden the question even
+further.  Given the recent advances in the field of mining software
+repositories, can we take advantage of the vast array of different
+software development artifacts to draw conclusions about the provenance of
+software entities?
+
+%Julius removed {Krinke2007} to get us down to 10 pages on August 27th, 2010
+
+There exist many studies on the origin, maintenance, and evolution of code
+clones~\cite{KapserG08,Krinke2008,Lozano2008,Lozano2007,ST09}, while others
+have examined clone lifespan and genealogy~\cite{Kim2005fse}.  The
+distinction between these studies and our own is that we study provenance
+across applications, and we are interested not only in finding similar
+entities, but determining where they come from.  We are also interested in
+matching similar entities when one of them is in compiled (binary) form.
+
+Clone detection methods (such as~\cite{KamiyaKI02,LivieriHMI07}), as well
+as the tracking of clones between applications~\cite{GermanPGA09} provided
+a starting point for our investigation.  Similar to Holmes et
+al.~\cite{HolmesWM06} we build our own code-search index.
+
+Di Penta et al.~\cite{DiPentaMSR2010} used code search engines to find the
+source code that corresponds to a Java archive (they used the fully
+qualified name of the class). They found that their main limitation was the
+inability to match a binary jar with the precise version of the source release
+it came from.
+Similarly, Hemel et al.~\cite{HemelKVD11} showed how extracting
+string literals from binaries to detect clones can work surprisingly well,
+often out-performing other more sophisticated techniques.
+Ossher et al.~\cite{OssherSL11} employ a technique they call
+``name-based fingerprints'' in their source-based clone analysis of the Maven 2
+Central repository; these fingerprints are a simplified version (e.g., no inner classes,
+no return types) of our \emph{anchored class signatures}. 
+We consider all of these works to be forms of Bertillonage.
+
+Recently, a line of research on software development ``recommender
+systems'' has arisen \cite{CubranicMSB05,HolmesW10,KerstenM05,RobillardWZ10}.  The
+goal here is to analyze a given working context --- such as the bug report
+being worked on, the source code files that have been changed, the API
+elements whose documentation has been accessed --- and try to infer what
+other artifacts (bug reports, API elements, documentation) might be
+relevant to the development task at hand.  This is done using historical
+usage information, which can be specific to a developer, a team, or
+use a public history repository.  This can be seen as another instance
+where is it desirable to characterize software artifacts and perform a
+loose matching algorithm on them against a large repository.  The matching
+algorithm must be loose to be useful, since it is highly unlikely that the
+exact combination of artifacts have ever been used at the same time before.
+
+
+% Di Penta and German et al.'s continued work on FOSS license usage and
+% patterns \cite{dmg2009icse}, and license auditing \cite{icpc2010}
+% provides background in current issues surrounding intellectual
+% property and open source software engineering.  The recent license
+
+% evolution \cite{icse2010} work in particular provides important
+% motivation for our study.
+
+
+% Maven2 acts like a major repository of Java source code and jars
+% archives. They are organized into directories based on the name of the
+% package. Within each of these directories one can find source code
+% and/or binary archives. Maven2 wants to become a central repository that
+% can be used for the dependency management tool Apache
+% Maven\footnote{\url{maven.apache.org}}. There is little organization
+% and no apparent documentation in terms of what goes into each of these
+% directories.  For example, the directory \mytt{myfaces} contains two
+% different copies of the same jar: \mytt{myfaces-1.0.9.jar} (one in the
+% main directory and another one in the directory \mytt{myfaces-1.0.9};
+% on contrast version 1.0.10 is only present in the directory
+% \mytt{myfaces-1.0.10}. It appears that, at this point, Maven2 is an
+% stage of gathering Java code, before it is properly organized.
+
+% Nonetheless, because it is one the most comprehensive repository of
+% Java code, and it is easily replicable, Maven2's un-versioned
+% architecture provides an excellent opportunity to mine for version
+% history and code evolution.  Many different versions of any given jar
+% file are contained therein.  We aim towards using Maven's
+% breadth--over 55,000 distinct Java namespaces, a.k.a. `packages'--and
+% its depth--over 61,000 distinct jar names providing multi-version
+% coverage of many projects--to improve two aspects of Di Penta et al.'s
+% work on code-search described in recent work by Di Penta et al.
+% \cite{DiPentaMSR2010}. In that paper, they propose a method to
+% identify the source code that created a given binary jar file, but
+% found that their main limitation was that using a search engine (such
+% as Google Code Search) it is not feasible to match the precise version
+% of the source code that created the given binary jar. The work
+% describe herein attempts to address that issue.
+
+% \DMG{Let us add a table with stats of maven: number of main
+%   directories(different packages), total, and median number of jars,
+%   total number of source code archives}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "000_main"
+%%% End: 

@@ -1,0 +1,82 @@
+\section{Bertillonage and Software Provenance{\label{sec:bertillonage}}}
+
+In the mid to late 19th century, police forces in Europe and elsewhere
+began to take advantage of emerging technologies.  For example,
+suspected criminals in Paris were routinely photographed upon arrest, and
+the photos were organized by name in a filing system.  Of course, criminals
+soon found out that if they gave a false name upon being arrested then
+their chances of being identified from the huge pool of photos was very
+small unless the police were particularly patient or happened to recognize
+them from a previous encounter.  Alphonse Bertillon, the son of a
+statistician who worked as a clerk for the Paris police, had the idea that
+if suspects could be routinely subjected to a series of simple physical
+measurements --- such as height, length of right ear, length of left foot,
+etc. --- then the photos could be organized hierarchically using the
+bio-metrics data, and the set of photographs that had to be examined for a
+given suspect could be reduced to a small handful.
+%changed subsequently to later, to gain one line
+This approach, later termed \emph{Bertillonage} in his honour, proved to be
+very effective and was a huge step forward in the burgeoning science of
+criminology~\cite{encyForensic2000}.
+
+As a forensic approach, Bertillonage also had its drawbacks.  Using the
+specialized measuring equipment required extensive training and practice to
+be reliable, and it was time-consuming to perform.  Each of 10 measurements
+was performed three times, because if even one measurement was off then the
+system did not work.  Also, the measurements taken did not have a high
+degree of independence; tall people tended to have long arms
+too.\footnote{The interdependence of the Bertillonage bio-metrics was
+recognized by Francis Galton, and it inspired him to devise the notion of
+statistical correlation.} In time, the emerging science of fingerprinting
+proved to be a much more effective and accurate identification mechanism
+and Bertillonage was forgotten.  Nevertheless, Bertillon and his other
+inventions --- including the modern mugshot and crime scene photography ---
+showed how simple ideas combined intelligently could greatly reduce the
+amount of manual effort required in forensic investigations. Despite its
+limitations, Bertillonage was considered the best method of identification
+for two decades~\cite{forensic2006}.
+
+Our goal in this work is to devise a series of techniques to aid in
+determining the \emph{provenance} of software entities.  That is, given a
+software entity such as a function definition or an included library, we
+would like to be able answer the question:  \emph{Where did this entity
+come from?}  Of course, most often the answer will be that the entity in
+question was created to fit exactly where it is within the greater design
+of the system, but sometimes entities are moved around, designs are
+refactored, new is copied from old and then tweaked.  We would like be able
+to answer this question authoritatively: this is version 1.3.7 of the X
+library; this SCSI driver is a tweaked clone of a driver of a similar card;
+most of this function $f$ was split off from function $g$ during a
+refactoring effort in the last development cycle, etc.  Sometimes, however,
+our answers will be best-effort guesses, especially if we do not have
+authoritative access to the original developers.
+
+We therefore use the metaphor of software Bertillonage, rather than, say,
+software fingerprinting, as we often lack sufficient evidence to make a
+conclusive identification.  Instead, we use a set of simple and sometimes
+ad-hoc techniques to narrow the search space down to a level where
+more expensive approaches (e.g., a manual determination, or a slow, exhaustive
+algorithm) may be feasible.
+
+\section{Our Previous Report}
+
+Compared to the implementation in our previous Software Bertillonage report
+\cite{DaviesGGH11}, we have since improved and enhanced our toolset, our
+corpus, and our experiments.  We have abandoned the source parser that we wrote
+from scratch.  Instead we use Java's own compiler, \mytt{javac}, from
+Oracle's 1.6.0\_20 release of Java, to
+analyze source code.  We have also switched our bytecode analyzer from
+\mytt{bcel-5.2.jar} to \mytt{asm-3.3.1.jar}.  Thanks to these improvements we can
+now extract more features from source and binary Java artifacts, such as generics, enums, and
+inner classes.  We obtained a new snapshot of the Maven2 repository to
+serve as our provenance corpus.  Surprisingly, the Maven2 repository has
+nearly doubled in size since our previous report, from 150 GB to 275 GB.
+We previously used an industrial case study to explore the feasibility of our
+main ideas.  We now test our improved techniques and tools with an
+empirical experiment based on 945 jar files of known provenance, as well as
+a replication of the original case study.
+
+
+\section{Replication}
+\noindent Data for replication is available at:\\
+\url{http://juliusdavies.ca/2013/j.emse/bertillonage/}

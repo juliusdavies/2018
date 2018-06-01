@@ -1,0 +1,121 @@
+
+
+- (Page 12)
+The paragraph just after the formula,
+starting "In the ideal case, L has only one member"
+should be merged into previous paragraph.
+
+
+- (Page 17)
+Change "Similarity Index" to "similarity index" (lowercase) in two
+places:
+1. "perfect Similarity Index, and that"
+2. "our sample using the Similarity Index measure was 5"
+
+- (Page 19)
+Change "Similarity Index" to "similarity index" (lowercase) in two
+places:
+1. "top matching Similarity index (966"
+2. "had a lower Similarity index than some other"
+
+
+- Table 1
+Can we get a single thin horizontal line (like a cell border)
+placed after the 5th row of data, to better separate the top-5
+rows from the bottom-2 rows?
+
+
+- Table 3
+Bold the following four *complete rows*:
+---
+High quality matches 383
+Low qualitiy matches 107
+No matches 455
+Total Matches:  (52%) 490  Average: 0.685  Average: 2.4
+---
+
+- Table 3:  change "Total Matches:" to "Total matches:" (lowercase the 'm')
+
+
+- Table 5
+Bold the following four *complete rows*:
+---
+High quality matches 710
+Low qualitiy matches 83
+No matches 152
+Total matches:  (84%) 793  Average: 0.890  Average: 3.5
+---
+
+
+- Table 7
+Bold the following four *complete rows*:
+---
+High quality matches 527
+Low qualitiy matches 133
+No matches 285
+Total matches:  (70%) 660  Average: 0.773  Average: 2.9
+---
+
+- Table 7:  move the 'n/a' that is under Min to under Mdn (two occurrences)
+- Table 7:  italicize all three occurrences of 'n/a'
+
+
+- Table 9
+Bold the following twelve *complete rows*:
+---
+High quality matches 74
+Low qualitiy matches 3
+No matches 4
+Total matches:  (95%) 77  Average: 0.903  Average: 2.8
+
+High quality matches 77
+Low qualitiy matches 4
+No matches 0
+Total matches:  (100%) 81  Average: 0.926  Average: 3.6
+
+High quality matches 55
+Low qualitiy matches 13
+No matches 13
+Total matches:  (84%) 68  Average: 0.812  Average: 1.5
+---
+
+- Table 9:  can we get a thin horizontal line (like a cell border)
+placed just above the entire "bin2bin/Industry-81" row, as well
+as the "bin2src/Industry-81" row?
+
+
+
+- Table 6, in the caption:
+Change: "matched out subject's,"
+To:     "matched our subject (jsearch-indexer-2.0.05.ds1.jar),"
+
+
+- Table 12, row 8 or 9 I believe:
+Change: "matches in 2011 case-study omitted"
+To:     "matches in 2011 case-study omitted.  Only 8 of these 26 omitted matches scored 1.000 in the 2012 study."
+(You may need to add an extra row and rework these three rows to look better, sorry!)
+
+
+- Page 33:
+Change: "large one Table 8."
+To:     "large one (see Table 8 for an example of this)."
+
+
+- Table 13 needs cardinality brackets in the column headers (sorry!):
+Change column header "b" to "|b|"
+Change column header "a INTERSECT b" to "|a INTERSECT b|"
+Change "(with a = 469)" to "(with |a| = 469)" in the title.
+(ps. by INTERSECT I mean the symbol \bigcap).
+
+
+
+- FINAL REQUEST:
+All of our captions are quite detailed, and most contain several sentences.
+I like your style whereby captions do not end with periods; I think it helps
+offset them from the general text.  But I don't think that style is working
+for this paper since our captions tend to be long and detailed.
+
+Can we have a final period added to all captions in the paper, including
+all figures and tables?
+
+

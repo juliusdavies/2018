@@ -1,0 +1,495 @@
+\section{Anchored class signatures, a Bertillonage approach}
+
+%-- \label{sec:method}
+
+To exemplify the concept of software Bertillonage, we propose a metric that
+addresses the following problem: given a Java binary archive, can we
+determine its original source code?
+%As described in Di Penta et al. \cite{DiPentaMSR2010}, Java
+%applications are frequently bundles of binary artifacts. To avoid
+%dependency problems such applications include in their distributable
+%archive copies of the dependencies. These copies are of two types.
+%The first is embedding binary archives (which in turn might include
+%other binary archives); and the second making copies of the source code of
+%these dependencies, such that they are compiled and included as part
+%of the application.
+The most obvious source of information is the name of the archive itself,
+i.e., one would expect that \mytt{commons-codec-1.1.jar} comes from
+\mytt{commons-codec}, an Apache project, release 1.1.\footnote{This is
+analogous to a policeman asking a suspect for her/his name and expecting a
+correct answer.}  However, in practice this does not always work:  some
+projects do not adhere to consistent naming and numbering policies,
+sometimes beta tags are removed from version identifiers, and sometimes
+version identifiers are removed altogether when the library sources are
+copied into the source tree of the application.
+
+%-- This approach breaks when the source of the project is
+%-- copied into the tree of the given application, as there is no longer a
+%-- specific archive for the embedded dependency.
+
+%Another approach, implemented by Di Penta et al. \cite{DiPentaMSR2010}, is
+%to use fully qualified name of each class, and a code search engine.
+%While effective to find the source of a class, the main
+%drawback of this approach is that it cannot match the binary to a precise version of the source.
+
+Alternatively, we could build a database of exact source-to-byte matches by
+compiling all known sources and indexing the results.  False positives are
+impossible under such a scheme, and thus matches would provide a direct and
+unquestionable link back to source code. But false negatives could arise in
+several ways, among these: variation of compilers (e.g., Oracle's javac7
+vs.\ IBM's jikes 1.22), debugging symbols (on or off), and different
+optimization levels.  Furthermore, library dependencies can be difficult to
+satisfy (especially for older artifacts) making full compilation a problem.
+Even without compiler variation, avenues for false negatives remain; for
+example, the build scripts themselves might inject information at
+build-time directly into class files.
+%Theoretical limitations aside, many practical concerns prevent us from
+%attempting to compile all known versions of all known sources in the open
+%source Java universe: engineering such an index would be computationally
+%and organizationally challenging,
+
+% \dmg{I don't like the next 2 paragraphs},,, JWD agrees, but we'll have to address this in our review cycle... if we get one!
+The philosophy we propose, software Bertillonage, requires us to seek
+characteristics that are easy to measure and compare such that, even if
+they do not guarantee an exact match, they will significantly reduce the
+search space.  We are particularly interested in features that survive the
+compilation process.  For Java, we considered the following list of
+attributes that are present in both source and binary forms:
+
+\vspace{0.3em}
+\begin{enumerate}
+\item The class's name.
+\item The class's namespace (a.k.a., `package').
+\item The inheritance tree.
+\item Implemented interfaces.
+\item Checked exceptions.
+\item Fields.
+\item Methods.
+\item Inner-classes.
+\item Generics.
+\item Class, method, and field modifiers (i.e., public, static, abstract).
+\item Return types, and method parameters.
+\item Relative position of methods and fields in the class.
+\end{enumerate}
+
+Many other features are lost during compilation, including comments, import
+statements, local variable names,
+parameter modifiers (such as \mytt{final}), and absolute position of
+methods, since line numbers are preserved only when the class is compiled
+with debug info.
+
+
+% The remaining features are available both in the source code and the
+% bytecode. 
+
+
+%-- our proposal for applying Bertillonage to binary archives is to define a
+%-- \emph{metric} 
+
+In a nutshell, we propose a Bertillonage metric for binary Java archives
+that can be used to match a binary class file to its likely source file.
+Not all of the source code classes may be included in the ultimate binary;
+for example, test classes are often excluded, and sometimes a source
+archive may be split into two or more binary archives.  To match a binary
+archive, we try to find the source archives with the largest overlap of
+classes between the binary archive and a source archive.
+
+Class file obfuscation could thwart Bertillionage, but this depends on the
+techniques employed by the obfuscation. Our method uses names of
+classes and methods, and our method is likely to fail if the
+obfuscator changes these. But our method will continue to work if the
+obfuscation is only renaming local variables and code reformatting. This is
+an interesting area of research, and we suspect it will become a
+cat-and-mouse game of one-upmanship, where software Bertillionage tools will try to
+defeat obfuscators, and obfuscators will continue to improve so that
+the 
+former methods cannot defeat them.
+
+
+\subsection{Anchored Class Signatures}
+\label{sec:anchored}
+
+%\abram{This intro needs to be spiffied up}
+
+Anchored class signatures attempt to provide us with a signature that
+we can match classes against other classes. This is achieved by
+describing the contents of a class in such a way that one could
+compare signatures against the same class or a similar class.
+
+%-- We characterize a class $C$,  with methods $M_1, ... , M_n$,
+%-- fields $F_1, ... , F_n$, and inner classes $C_1, ... , C_n$,
+%-- (in either source or binary form) to possess an \emph{anchored class
+%-- signature}, denoted as \querySurface{c}, and defined as a tuple: 
+%-- \[ 
+%-- \querySurface{c} =
+%-- \langle \signature{c}, 
+%--     \langle \signature{M_1}, ... \signature{M_n} \rangle, 
+%--     \langle \signature{F_1}, ... \signature{F_n} \rangle, 
+%--     \langle \querySurface{C_1}, ... \querySurface{C_n} \rangle 
+%-- %--     \langle \signature{C_1}, ... \signature{C_n} \rangle 
+%-- \rangle \]
+%-- \noindent
+%-- where \signature{a} is the type signature of the class, field, method, or
+%-- inner-class $a$. That is, the anchored signature of a class is the type
+%-- signature of the class itself, and the ordered sequence of the type
+%-- signatures of each of its methods, fields, and recursively, its
+%-- inner-classes.  We say the signature is \emph{anchored} since it includes
+%-- the fully qualified name of the Java file, and in this way our signature
+%-- preserves attributes used by Java's own built-in name resolution mechanism
+%-- (i.e., the \mytt{CLASSPATH}).  We note, however, that when developers copy
+%-- and paste (clone) complete classes into their own application, they
+%-- sometimes alter the namespace declaration of the original class, in essence
+%-- relocating the copied logic into a new namespace.  Our \emph{anchored}
+%-- approach will be unable to find matches in these cases, but our results
+%-- should also possess less noise; for example, very small single-constructor
+%-- exception-handling classes that happen to be coincidentally named will not
+%-- pollute our results.
+
+We define the \emph{anchored class signature} of a class in terms of its
+own signature and the signatures of its components.  Since classes may
+contain inner classes, our formal definition requires two steps.  
+If a class $C$ has methods $M_1, ... , M_n$ and fields $F_1, ... , F_n$ but
+contains no inner classes, then  we define its \emph{anchored class
+signature}, denoted \querySurface{c}, as a tuple: 
+\[ 
+\querySurface{C} =
+\langle \signature{C}, 
+    \langle \signature{M_1}, ... , \signature{M_n} \rangle, 
+    \langle \signature{F_1}, ... , \signature{F_n} \rangle
+\rangle \]
+\noindent
+where \signature{a} is the type signature of the class, field,  or method.  
+If a class $C$ has methods $M_1, ... , M_n$, fields $F_1, ... , F_n$, and
+inner classes $C_1, ... , C_n$, then  we define its \emph{anchored class
+signature}, denoted \querySurface{c}, as a tuple: 
+\[ 
+\querySurface{C} =
+\langle \signature{C}, 
+    \langle \signature{M_1}, ... , \signature{M_n} \rangle, 
+    \langle \signature{F_1}, ... , \signature{F_n} \rangle, 
+    \langle \querySurface{C_1}, ... , \querySurface{C_n} \rangle 
+\rangle \]
+
+\noindent
+That is, the anchored signature of a class is the type signature of the
+class itself (its name, if it is \texttt{public} or not, what it
+extends/implements), and the ordered sequence of the type signatures of
+each of its methods, fields, and recursively, the anchored class signatures
+of its inner classes.  We say the signature is \emph{anchored} since it
+includes the fully qualified name of the Java file, and in this way our
+signature preserves attributes used by Java's own built-in name resolution
+mechanism.  We note, however, that when
+developers copy and paste (clone) complete classes into their own
+application, they sometimes alter the namespace declaration of the original
+class, in essence relocating the copied logic into a new namespace.  Our
+\emph{anchored} approach will be unable to find matches in these cases, but
+our results should also possess less noise; for example, very small
+single-constructor exception-handling classes that happen to be
+coincidentally named will not pollute our results.
+
+When building the signature, all fully qualified
+object types in the decompiled bytecode
+(including those in \mytt{throws} clauses)
+are stripped of their package prefixes.
+For example, \mytt{g.h.I} becomes \mytt{I}
+and \mytt{java.lang.String} becomes \mytt{String}.
+Java's \mytt{import} mechanism is effectively
+irreproducible, since resolution of wildcard imports
+(e.g., \mytt{import java.util.*})
+depends on the exact contents of
+directories and archive files listed in the
+\mytt{CLASSPATH} environment variable at the time of
+compilation.\footnote{Identifying
+%
+the class's \emph{own} fully qualitifed name is determinate.
+The indeterminism only arises when we try to resolve internal
+references that point to \emph{other} classes.}
+%
+To workaround this limitation we remove the namespace
+component of every referenced object type.
+Fully qualified names in source code
+that are referenced inline --- although rare --- are also
+stripped of their package prefixes, since we have no way
+of knowing in the bytecode if the name came from an import
+statement or from an inline type reference.
+
+\begin{figure}
+  \centering
+  \begin{minipage}[h]{0.85\linewidth}
+\hrule
+\lstset{language=Java,
+  tabsize=2,frame=none,
+  keywordstyle=\color{darkblue},commentstyle=\color{darkgreen},stringstyle=\color{darkgreen},
+  numbers=left,numberstyle=\scriptsize,numbersep=5pt,
+  breaklines=true,showstringspaces=false,basicstyle=\scriptsize\ttfamily,emph={label}
+}
+\begin{lstlisting}
+package a.b;
+import g.h.*;
+
+/**
+ * @author Jane Doe
+ * @since January 1, 2001
+ */
+public class D
+implements I<Number> {
+
+  synchronized static int a(
+    String s
+  ) throws E {
+    return "abc".hashCode() - s.hashCode();
+  }
+}
+\end{lstlisting}
+\hrule\vspace{1mm}
+  \end{minipage}
+  \caption{\small{Source code of a class D.}}
+\label{lst:cJava}
+\end{figure}
+
+
+Consider a class file \mytt{D.java} (Fig.~\ref{lst:cJava}) and its
+corresponding decompiled bytecode (Fig.~\ref{lst:cClass}).  The Java
+compiler will insert an empty constructor if no other constructors are
+defined, and for that reason the bytecode version contains an empty
+constructor.  Class D's signature (Fig.~\ref{lst:cSig}) is composed of the
+type signature of the class, including the class's fully-qualified name,
+the type signature of the default constructor
+$D$, and the type signature of its method \mytt{a(String)}.
+
+
+\begin{figure}
+  \centering
+  \begin{minipage}[h]{0.85\linewidth}
+\hrule
+\lstset{language=Java,
+  tabsize=2,frame=none,
+  keywordstyle=\color{darkblue},commentstyle=\color{darkgreen},stringstyle=\color{darkgreen},
+  numbers=left,numberstyle=\scriptsize,numbersep=5pt,
+  breaklines=true,showstringspaces=false,basicstyle=\scriptsize\ttfamily,emph={label}
+}
+\begin{lstlisting}
+package a.b;
+
+public class D extends java.lang.Object
+implements g.h.I<java.lang.Number> {
+
+  public D() {
+    // Empty constructor added by javac;
+    // all classes need constructors.
+  }
+
+  synchronized static int a(
+    java.lang.String s
+  ) throws a.b.E {
+    /* [compiled byte code] */
+  }
+}
+\end{lstlisting}
+\hrule\vspace{1mm}
+\end{minipage}
+  \caption{\small{Decompiled version of a class D to illustrate how the correponding Java bytecode
+appears to our tools when we analyze it using the \emph{asm-3.3.1.jar} bytecode analyzer.}}
+\label{lst:cClass}
+\end{figure}
+
+
+\begin{figure}[htbp]
+{
+\hrule\vspace{1mm}
+\scriptsize
+\signature{D}\quad = \mytt{public class a.b.D implements I<Number>}\\
+\signature{M_1} = \mytt{public <init>()}\\
+\signature{M_2} = \mytt{default synchronized static int a(String) throws E}
+\[\querySurface{D} = \langle \signature{D}, \langle \signature{M_1},
+\signature{M_2}\rangle \rangle\]
+}
+\vspace{-4mm}\hrule\vspace{1mm}
+  \caption{\small{Anchored class signature for \mytt{D.java} \& \mytt{D.class}.
+Both \mytt{javac-1.6.0\_20} and \mytt{asm-3.3.1.jar} refer internally to constructors as ``\mytt{<init>}"
+rather than the class name.}}
+  \label{lst:cSig}
+\end{figure}
+
+\subsection{Similarity Index of Archives}
+\label{sec:sim}
+
+To compare two archives we define a metric called the \emph{similarity
+index} of archives, which is intended to measure the similarity of two
+archives with respect to the signatures of the classes within them.
+Formally, given  an archive $A$ composed of $n$ classes $A = \{ c_1, ...  ,
+c_n\}$, we define the signature of an archive as the set of signatures of
+its contained classes.  
+\[\querySurface{A} = \{ \querySurface{c_1}, ... , \querySurface{c_n}\} \]
+We define the \emph{Similarity Index} of two archives $A$ and $B$, denoted as
+$sim(A, B)$, as the Jaccard coefficient of their signatures:
+\[ sim(A,B) = {{ | \querySurface{A} \bigcap
+    \querySurface{B}| }\over{| \querySurface{A} \bigcup
+    \querySurface{B}}| }\]
+Ideally, a binary archive $b$ would have originated in source archive $S$
+if $sim(b,S)$ ~ $= 1.0$. In practice, however, the similarity score of a binary compared to its
+source archive is often lower than 1.0, for two
+reasons: first, there are cases where an archive contains two or more
+different archives (e.g., embedded dependencies); second, not all files in
+the source archive may be present in the binary archive (such as test
+cases, or examples). To address these issues we define two more indices:
+\emph{inclusion} and \emph{containment}.
+
+% classes in the source archive are often excluded from the binary archive
+% (such as test cases). A source archive with a very large number of test
+% classes might have a low similarity coefficient with its binary archive.
+% Similarly, a large archive that includes a complete copy of source code from
+% the original system will, due to the increased size, also have
+% a low similarity index.   
+
+\subsection{Inclusion Index of Archives}
+
+To identify when the subject $A$ is a likely subset of the candidate $B$, we
+define the inclusion index.
+The inclusion index of archive $A$ in $B$,
+denoted as $inclusion(A,B)$, is the proportion of class signatures found
+in both archives with respect to the size of $A$.  
+\[ inclusion(A,B) = {{| \querySurface{A} \bigcap \querySurface{B} |
+  }\over{| \querySurface{A}}| }\]
+The intuition here is that when the inclusion index of a binary archive $A$
+in archive $B$ is close to 1, then the classes in $A$ are present in $B$.
+
+
+\subsection{Containment Index of Archives}
+
+Similarly, we would like to know if a candidate archive $B$ is contained in the
+subject $A$.  We define the containment index of archive $A$ in $B$,
+denoted as $containedBy(A,B)$, as the proportion of class signatures
+found in both archives with respect to the size of the candidate archive
+$B$.  
+\[ containedBy(A,B) = {{| \querySurface{A} \bigcap \querySurface{B} |
+  }\over{| \querySurface{B}}| }\]
+In this case, when the containment index of a binary archive $A$ with respect to
+archive $B$ is 1, then $A$ contains all the classes in $B$.
+
+\subsection{Finding Candidate Matches} %of a Binary\\ Archive}
+\label{sec:finding}
+
+Given a candidate archive, we can use the similarity,
+inclusion, and containment indices to approximate the
+extent to which archives in our corpus contain identical
+code as the candidate, either in binary or source form.
+The indices also help us understand the nature of the
+provenance relationship.  \emph{Similarity} helps us when
+the candidate is directly related to its match.
+\emph{Containment} helps us when the candidate cloned some
+of its dependencies (the candidate is a super-archive),
+and \emph{inclusion} helps us for the inverse situation,
+when the candidate is itself a cloned dependency,
+and other super-archives include the candidate.
+All three situations can arise simultaneously when
+analyzing even a single candidate, since an archive can
+clone its dependencies, can be cloned by others, and,
+finally, can match relatives of itself.  Users of our
+methods should prioritize one index over another depending
+on their specific analytical needs.
+
+\emph{Inclusion} and \emph{containment} are simple ratios
+that report the percentage of common-code contained in the
+candidate and the dependency, respectively, and thus they
+are simple to interpret.  For example,
+\mytt{Azureus2.jar} (from Vuze, version 4.3.0.6) scores
+inclusion of 8.9\% and containment
+of 32.5\% when compared to \mytt{bcprov-jdk14-138.jar}.
+This tells us that Azureus can be seen as containing 32.5\%
+of BouncyCastle (version 138), and, conversely, BouncyCastle
+can be seen as containing 8.9\% of Azureus.  The causality of
+the provenance is unknown --- Who copied from who?  Could
+code be flowing in both directions? --- but the relationship
+between these two artifacts is evident, and further manual
+analysis can unearth the causality
+(Azureus copied from BouncyCastle).
+
+The \emph{similarity} measure is more complicated to
+understand, since Jaccard is a ratio of set-intersection
+to set-union, and  thus lacks a natural mapping to provenance,
+except at the extreme values (1.0 is a perfect match,
+0.0 occurs when nothing matches).
+Since non-extreme similarity values contain little inherent
+meaning, we interpet \emph{similarity} as an ordering function:  
+higher scores imply better matches. 
+Thus we can formalize finding the best match(es) for a binary
+archive in an archive corpus using the similarity metric as
+follows: given a set of archives $S = \{ s_1, ..., s_n\}$
+(the corpus), we define the \emph{best candidate matches}
+of subject archive $a$ as the subset of $L \subseteq S$ such that:
+
+\[ \forall s_i \in L \quad sim(a,s_i) > 0 \wedge sim(a,s_i) = max_{sim}[S, a]  \]
+where $max_{sim}[S, a]$ is the maximum similarity index of $a$ and the
+elements in $S$.
+In the ideal case, $L$ has only one member.  In practice,
+however, the corpus often has several candidate matches with equal maximum
+similarity scores.  We have found several reasons for multiple archives
+having the same maximal score: there may be identical redundant archive
+copies in Maven2; some archives differ only in documentation or other
+non-code attributes; some non-identical archives may simply achieve equal
+scores;
+%\footnote{This can happen when the candidate that would exactly match is missing from the corpus (a hole), and the releases before and after both differ in exactly $n$ signatures.}
+and the signature of an archive may
+remain constant across multiple versions if there are implementation
+changes but no interface changes.  This last case is typical in minor
+release updates.
+
+We exemplify our approach in Table~\ref{tab:metricsExample}. The
+subject is the binary jar \mytt{asm-2.2.3.jar}, and the candidates are
+binary and source archives in Maven2. As it can be seen, the
+perfect inclusion score of 1 matches three different versions (2.2.3, 2.2.2, and 2.2.1), whereas
+version 2.1 is more distant (inclusion index 0.636). The perfect inclusion score
+of 1 also suggests the larger \mytt{asm-5.1.0.jar} library probably contains a
+perfect copy of \emph{asm}, but repackaged by \emph{JOnAS} (an application server
+bundle). Notice how the filename no longer reflects the version of
+\emph{asm}, but the version of \emph{JOnAS}. Finally, the source archives with the
+highest inclusion are versions \mytt{2.2.1-sources} and \mytt{2.2.2-sources}. Surprisingly, Maven2 did not
+contain a copy of the sources of the version 2.2.3 subject, although it contained a copy
+of the binary. This highlights two challenges we are trying to
+address.  First, there is a much higher concentration of binary
+artifacts in Maven2 compared to source artifacts.
+Second, there is no certainty a particular subject will be found in the
+corpus, and so we must find the closest match possible instead.
+
+%\dmg{I did run it against the source of its website:
+%  \url{http://asm.ow2.org} the file asm-2.2.3.tar.gz. The tar file has 
+%  183 signatures, compared to 8 in the binary!!!! so its containment is
+%  0.04371 and its inclusion 0.364. I don't know why 14 jars don't
+%  match, but it might be something wacky in it}
+
+
+\begin{table}[htbp]
+\small
+  \centering
+  \begin{tabular}{r|r|r|r|r|r|r|l}
+ $|A|$ & $|B|$&$|\bigcap |$ & $| \bigcup |$ & $sim$  &
+ $incl$& $cont$ & path for each $B$ \\
+\hline
+  22 &   22 &            22 &        22 &  1.000  &  1.000    &  1.000    & asm/2.2.1/asm-2.2.3.jar\\
+  22 &   22 &            22 &        22 &  1.000  &  1.000    &  1.000    & asm/2.2.3/asm-2.2.2.jar\\
+  22 &   22 &            22 &        22 &  1.000  &  1.000    &  1.000    & asm/2.2.1/asm-2.2.1.jar\\
+  22 &   21 &            14 &        29 &  0.483  &  0.636    &  0.667    & asm/2.1/asm-2.1.jar\\
+  22 &   91 &            22 &        91 &  0.242  &  1.000    &  0.242    & jonas/../5.1.0/asm-5.1.0.jar\\
+\hline
+  22 &   22 &             8 &        36 &  0.222  &  0.364    &  0.364    & asm/2.2.1/asm-2.2.1-sources.jar\\
+  22 &   22 &             8 &        36 &  0.222  &  0.364    &  0.364    & asm/2.2.1/asm-2.2.2-sources.jar\\
+% 77 & 77 &            77 &        77 &  1.000  &  1.000    & maven2/cewolf/1.0/cewolf-1.0.jar        \\
+% 77 & 77 &            68 &        86 &  0.791  &  0.883    & maven2/cewolf/0.12.0/cewolf-0.12.0.jar  \\
+% 77 & 77 &            64 &        90 &  0.711  &  0.831    & maven2/cewolf/0.10.3/cewolf-0.10.3.jar  \\
+  \end{tabular}
+  \vspace{1mm}
+  \caption{Best results based on Bertillonage metrics when the
+    subject archive  is \mytt{asm-2.2.3.jar}. The top matches are binary
+    archives; here, 3 versions match perfectly. The bottom matches are
+    source archives; the expected source package,
+    \mytt{asm-2.2.3-sources.jar} was not present in the corpus (Maven2) and
+    the top matches were versions 2.2.1, and 2.2.2.} 
+  \label{tab:metricsExample}
+\end{table}
+
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "000_main"
+%%% End: 

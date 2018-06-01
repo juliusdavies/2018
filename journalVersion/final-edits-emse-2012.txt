@@ -1,0 +1,525 @@
+
+Hi, Editor,
+
+I improved a few paragraphs.  For now I've pasted
+the raw latex.  If you can work with that, great,
+but if not, let me know, and I will provide you
+with those edits in a different way.
+
+Also, I requested some changes to Figure 4
+(a code listing) which will change its line numbering.
+Can you do this?  Or should I mock up a dummy
+latex file with the listing for you to copy & paste?
+
+-----------------------------
+
+Q1:  Title correct.  Subtitle correct, but needs to be fixed
+     in metadata.
+
+Q2 & Q3:  I will send this within 24 hours of this email
+
+Q4:  All tables checked, and edits provided below.
+
+Q5:  My detailed edits below remove the dummy citation
+     and fix it properly.
+
+Q6 & Q7:  They look great.  Thanks!
+
+Q8:  I will send this within 24 hours of this email.
+
+
+Q8 (line 1328):
+Change the "(Gosling et al. 2000)" reference to "(Gosling et al. 2005)"
+and use this URL instead:
+http://docs.oracle.com/javase/specs/jls/se5.0/html/lexical.html#3.8
+(Accessed March 27th, 2012)
+
+The previous URL is gone!
+
+
+Q8 (line 1331): (Accessed: March 27th, 2012)
+
+Q8 (line 1365): (Accessed: March 27th, 2012)
+
+Q8 (line 1366): (Accessed: March 27th, 2012)
+
+
+
+
+
+
+
+
+
+-----------------------------
+
+*** Metadata ***
+
+- Metadata pg. 1, line 2:
+  Article Sub-Title is blank in Metadata.
+  Should be:  "Determining the provenance of software development artifacts."
+
+
+*** Article ***
+
+- Article, line 17:
+  "conduct" should be "conducted"
+
+- Line 67, 68:
+  Paragraph isn't fully justified.
+
+- Line 127:
+  "previous report" should be "initial report"
+
+- Lines 231 - 242:
+  Could these definitions be distanced from each other a
+  little better?  (A little more space between them?)
+  Also, dictionary-style indenting would be nice,
+  with the defined term offset to the left a little.
+  (If the formatting is on purpose to conform to
+   J.EMSE's style, then so be it.)
+
+- Line 256:
+  "sometimes beta tags are removed from version identifiers"
+  is pretty esoteric.  Change it to "some projects do not
+  bother including version information in their releases"
+
+- Line 257:
+  Change "the library" to "library"  (remove "the")
+
+- Line 258:
+  Change "the application" to "a consuming application"
+
+- Line 313:
+  Change "tuple" to "3-tuple"
+
+- Line 316:
+  Change "tuple" to "4-tuple"
+
+- Line 321:
+  Change "Java file" to "Java class"
+
+- Lines 329-339:
+  Rewrite paragraph that begins "When building" to the following:
+
+When building the signature, all fully qualified
+object types in the decompiled bytecode
+(including those in \mytt{throws} clauses)
+are stripped of their package prefixes.
+For example, \mytt{g.h.I} becomes \mytt{I}
+and \mytt{java.lang.String} becomes \mytt{String}.
+Java's \mytt{import} mechanism is effectively
+irreproducible, since resolution of wildcard imports
+(e.g., \mytt{import java.util.*})
+depends on the exact contents of
+directories and archive files listed in the
+\mytt{CLASSPATH} environment variable at the time of
+compilation.\footnote{Identifying
+the class's \emph{own} fully qualitifed name is determinate.
+The indeterminism only arises when we try to resolve internal
+references that point to \emph{other} classes.}
+To workaround this limitation we remove the namespace
+component of every referenced object type.
+Fully qualified names in source code
+that are referenced inline --- although rare --- are also
+stripped of their package prefixes, since we have no way
+of knowing in the bytecode if the name came from an import
+statement or from an inline type reference.
+
+
+- Line 345:
+  Change:  "of its method a(String)"
+  To:      "of its one method."
+  
+
+- Lines 350-351:
+  Change:  "as the set of signatures of its contained classes"
+  To:      "as the set of class signatures generated from the $n$ classes."
+  (Note:  $n$ means italicized n.  Don't add dollar-signs!)
+
+
+- Figure 3 (listing):
+  Remove the word "default"
+
+
+- Rewrite first 6 paragraphs of section 4.5 (lines 376-400, including
+  formula between lines 399 and 400) to the following 3 paragraphs:
+
+Given a candidate archive, we can use the similarity,
+inclusion, and containment indices to approximate the
+extent to which archives in our corpus contain identical
+code as the candidate, either in binary or source form.
+The indices also help us understand the nature of the
+provenance relationship.  \emph{Similarity} helps us when
+the candidate is directly related to its match.
+\emph{Containment} helps us when the candidate cloned some
+of its dependencies (the candidate is a super-archive),
+and \emph{inclusion} helps us for the inverse situation,
+when the candidate is itself a cloned dependency,
+and other super-archives include the candidate.
+All three situations can arise simultaneously when
+analyzing even a single candidate, since an archive can
+clone its dependencies, can be cloned by others, and,
+finally, can match relatives of itself.  Users of our
+methods should prioritize one index over another depending
+on their specific analytical needs.
+
+\emph{Inclusion} and \emph{containment} are simple ratios
+that report the percentage of common-code contained in the
+candidate and the dependency, respectively, and thus they
+are simple to interpret.  For example,
+\mytt{Azureus2.jar} (from Vuze, version 4.3.0.6) scores
+inclusion of 8.9\% and containment
+of 32.5\% when compared to \mytt{bcprov-jdk14-138.jar}.
+This tells us that Azureus can be seen as containing 32.5\%
+of BouncyCastle (version 138), and, conversely, BouncyCastle
+can be seen as containing 8.9\% of Azureus.  The causality of
+the provenance is unknown --- Who copied from who?  Could
+code be flowing in both directions? --- but the relationship
+between these two artifacts is evident, and further manual
+analysis can unearth the causality
+(Azureus copied from BouncyCastle).
+
+The \emph{similarity} measure is more complicated to
+understand, since Jaccard is a ratio of set-intersection
+to set-union, and  thus lacks a natural mapping to provenance,
+except at the extreme values (1.0 is a perfect match,
+0.0 occurs when nothing matches).
+Since non-extreme similarity values contain little inherent
+meaning, we interpet \emph{similarity} as an ordering function:  
+higher scores imply better matches. 
+Thus we can formalize finding the best match(es) for a binary
+archive in an archive corpus using the similarity metric as
+follows: given a set of archives $S = \{ s_1, ..., s_n\}$
+(the corpus), we define the \emph{best candidate matches}
+of subject archive $a$ as the subset of $L \subseteq S$ such that:
+
+\[ \forall s_i \in L \quad sim(a,s_i) > 0 \wedge sim(a,s_i) = max_{sim}[S, a]  \]
+where $max_{sim}[S, a]$ is the maximum similarity index of $a$ and the
+elements in $S$.
+
+
+- (Remainder of final paragraph from line 401 does not change after line 401).
+
+
+
+- Table 1, there should be a divider (\hline) between
+  rows t1.7 and t1.8.
+
+- Table 1, caption (t1.10):
+  Change semi-colon between "archives; the expected" to a period.
+
+- Table 1, caption (t1.10):
+  Remove the final words "and the top matches were version 2.2.1, and 2.2.2."
+
+- Line 429:  change semi-colon to period.
+
+- Line 429:  change "it" to "Maven2"
+
+- Footnote 6:  change "does push" to "pushes".
+
+- Footnote 6:  change ", but" to a period (and remove the word "but").
+
+- Line 467:  change "asm.jar" to "asm-3.3.1.jar"
+
+- Lines 472-473:
+  Change: "of Java's implementation"
+  To:     "with how Java source files relate to their compiled representations." 
+
+- Line 482-483:
+  Change:
+  "class files, and with out method it contains 3 anchored signatures, as show in Table 2."
+
+  To:
+  "class files.  As shown in Table 2, A.java contains three anchored signatures."
+
+
+- Figure 4:
+  Change:
+  "We use this program to illustrate an asymmetry of Oracle's Java implementation:"
+  To:
+  "We use this program to illustrate an asymettry of Java:"
+
+  (This should enable line 7 to absorb the widow "classes" sitting alone on line 8)
+
+- Figure 4:
+  Remove blank line 23.
+
+- Figure 4:
+  Remove blank line 25
+
+- Table 2 (t2.1) title, change to:
+  "A.java, when analyzed by our tool, generates 3 signatures, and compiles into 7 class files."
+
+- Table 2 (t2.3) next to "A.java" add " (See Fig. 4)"
+
+- Table 2 (t2.12) add extra space above and below this row.
+  (I'm hoping the line-removals I asked for with Figure 4, above, free up enough space for this.)
+
+- Line 534:  remove the word "actively"
+
+- Line 544:  change period to colon.
+
+- Line 547:  remove the word "further"
+
+- Lines 547-548:
+  change: "as a kind of validity check of our tools,"
+  to:     "to further validate our tools,"
+
+- Line 553:  add ".jar" (in italics) to this list of file suffixes.
+
+- Line 569:  change "Similarity Index" to "similarity index" (lowercase)
+
+- Line 570:  change "asked: For" to "asked: for" (lowercase)
+
+- Line 571:  change "in Maven" to "in the Maven"
+
+- Line 572:  change "Similarity" to "similarity" (lowercase)
+
+- Footnote 9 (1st line):  change "Probably" to "We suspect"
+
+- Footnote 9 (3rd line):
+  change: "critical interface library which all"
+  to:     "critical interface library, originally published by Sun Microsystems, which all"
+
+- Line 578:
+  change: "Inclusion occurs" to "Inclusion and containment occur"
+
+- Lines 580-582 replace the sentence starting "Containment occurs..." with:
+
+By our definition, inclusion and containment are inverses of each other:
+inclusion(A, B) = containedBy(B, A).
+
+- Line 588:  change: "top Inclusion index"    to: "top containment index"
+
+- Line 590:  change: "top Containment index"  to: "top inclusion index"
+
+- Line 591:  change: "that tends be"             to: "tend to be"
+
+- Line 593:  change: "Inclusion and Containment"
+             to:     "inclusion and containment" (lowercase)
+
+- Line 593:  change: "Similarity" to "similarity" (lowercase)
+
+- Line 594:  change: "Index." to "index." (lowercase)
+
+- Figure 5:  change title to:
+  "Number of Binary-To-Binary Matches per Type of Metric"
+
+- Line 612:  change "Similarity Index" to "similarity index" (x 2 lowercase)
+
+- Line 614:  change "Similarity Index" to "similarity index" (lowercase)
+
+- Line 615:  change "Low Similarity" to "Low similarity" (lowercase)
+
+- Line 621:  change "Inclusion Index" to "inclusion index" (lowercase)
+
+- Line 621:  it should reference "Fig. 6" instead of "Fig. 5" here.
+
+- Line 623:  change "Inclusion" to "inclusion" (lowercase)
+
+- Line 643:  change "Inclusion Index" to "inclusion index" (lowercase)
+
+- Line 645:  change "question: What" to "question: what" (lowercase)
+
+- Line 648:  change "Containment Index" to "containment index" (lowercase)
+
+- Line 650:  change "Similarity Index" to "similarity index" (lowercase)
+
+- Line 651:  change "Containment" to "containment" (lowercase)
+
+- Line 651:  remove reference to "(Fig 6.)" since this is the wrong place for it.
+
+- Figure 6:  change title to:
+  "Number of Binary-To-Source Matches per Type of Metric"
+
+- Lines 668-669:  try not to split the phrase in parentheses
+  "(it contained the dependencies that it required to function)" over the
+  page break.  Maybe start paragraph of line 666 on the next page?
+
+- Line 670:
+  change: "contains the source"
+  to:     "contains an identical set of signatures as those in the source" 
+
+- Lines 680-683:  remove everything starting from "However, we have a"
+  to end of line 683.
+
+- Line 684:  merge with previous paragraph and change: "To control for this variable,"
+  to:        "To control for holes in our corpus,"  
+ 
+- Line 708:  start new paragraph
+
+- Line 740:  change: "at most 20 s"    to: "at most 60 s"
+
+- Footnote 11:  change: "C.class. These"   to: "C.class, since these"
+
+- Footnote 11:  remove the final clause:  ", whereas the other 4 classes do."
+
+- Line 820:  remove: "(rare, but we observed some instances)"
+
+- Line 836:  bold:  "High Quality (HQ):"
+
+- Line 839:  bold and italicize:  "HQ1."  bold:  "Identical archive:"
+
+- Line 841:  bold and italicize:  "HQ2."  bold:  "Identical contents:"
+
+- Line 846:  bold and italicize:  "HQ3."  bold:  "Expected match:"
+
+- Line 848:  bold and italicize:  "HQ4."  bold:  "Version off by final digit:"
+
+- Line 852:  bold:  "Low Quality (LQ):"
+
+- Line 854:  bold and italicize:  "LQ1."  bold:  "Version off by many digits:"
+
+- Line 863:  bold and italicize:  "LQ2.   bold:  "Not useful:"
+
+- Line 873:  bold:  "No match:"
+
+- Table 3:
+   - Change title to:
+     "The baseline results based on binary SHA1 fingerprints of 945 Debian jars" 
+   - Remove row:  "sha1-of-class/Debian-945"
+   - Move t3.8 to just before t3.4 and bold it.
+   - Move t3.11 to just before t3.9 and bold it.
+   - On t3.13 move "(52%)" closer to 490 (if possible).
+   - Personally I would prefer if Table 3 was at the
+     top of the next page, and if "Section 6.2.2" on line 919
+     started on its own page.
+
+- Table 4:  Change title to:
+     "35 artifacts in the Maven2 corpus tied for top place with
+      identical bytecode to plexus-component-annotations-1.0-beta-3.0.7.jar
+      using binary fingerprint (SHA1) matches."
+
+- Table 5:
+   - Change title to:
+     "Experiment 1, bin2bin results --- out signature-based approach applied to 945 Debian jars"
+   - Remove row "bin2bin/Debian-945"
+   - Move t5.8 to just before t5.4 and bold it.
+   - Move t5.11 to just before t5.9 and bold it.
+   - On t5.13 move "(84%)" closer to 793 (if possible).
+   
+- Table 6:
+   - Change title to:
+     "Low similarity scores can nonetheless convey important provenance information."
+   - Change first sentence of caption to:
+     "The best match here was javahelp-2.0.05.jar, but only 9 of 195 signatures matched our subject's,
+      resulting in a low similarity score. "
+
+- Line 940: change "(3.5 ties to examine vs. 2.4"
+  to:              "(3.5 ties to examine per query vs. 2.4"
+
+- Table 7:
+    - Change title to:
+      "Experiment 1, bin2src results --- our signature based approach applied to 945 Debian jars"
+    - Remove row "bin2src/Debian-945"
+    - Move t7.8 to just before t7.4 and bold it.
+    - Move t7.11 to just before t7.9 and bold it.
+    - On t7.13 move "(70%)" closer to 660 (if possible).
+
+- Table 8:
+    - Change title to:
+      "The best (and only) match for ant-apache-log4j-1.7.1.jar, a jar containing a single class,
+       had an extremely low similarity score."
+
+- Table 9:
+    - Keep "sha1-of-class/Industry-81" row (leave it alone)
+    - Move t9.8 to just before t9.4 and bold it.
+    - Move t9.11 to just before t9.9 and bold it.
+    - On t9.13 move "(95%)" closer to 77 (if possible).
+    - Remove t9.14
+
+- Table 9 (continued):
+    - Keep "bin2bin/Industry-81" row (leave it alone).
+    - Move t9.19 to just before t9.15, bold it, and remove indent.
+    - Move t9.22 to just before t9.20 and bold it.
+    - On t9.24 move "(100%)" closer to 81 (if possible).
+    - Remove t9.25
+
+- Table 9 (continued again!):
+    - Keep "bin2src/Industry-81" row (leave it alone).
+    - Move t9.30 to just before t9.26 and bold it.
+    - Move t9.33 to just before t9.31 and bold it.
+    - On t9.35 move "(84%)" closer to 68 (if possible).
+
+- Line 984:  remove word "particularly"
+
+- Table 10:  change title to:
+  "Holes in the corpus: the suspect is not on file, but we can still isolate close relatives"
+
+- Table 11:  keep title, but remove caption.
+
+- Lines 1015-1016:
+  Change "could be false, insomuch as provenance is concerned."
+  To     "may only indicate a strong relationship to the subject,
+          rather than a definitive answer of provenance."
+       
+- Line 1028:
+  Change "source files" to "source signatures"
+
+- Line 1029:
+  Change "compiled class files" to "compiled class signatures"
+
+- Table 12:
+  Title seems split into two up/down cells.  Let's put the title into a single
+  cell.  Change the title to:
+  "Similarity scores for case study (2011) & replication (2012) for wicket-ioc-1.4.0.jar"
+
+- Table 12, prepend this sentence to the caption (t12.11):
+  "Here we compare a single result from our original 2011 case-study (Davies et al. 2011)
+  against the same result in this 2012 replication."
+
+  [It then continues:] With our improved....
+
+- Table 12, append this to the very end of the caption (t12.11):
+  [It reads:] using our newer signature-extractor
+  [And let's add:] ", since the newer tool adds more features such as generics and inner-classes to the signatures."
+
+- Line 1037:  finish the sentence with a reference to Table 8.
+
+- Line 1054:  change "by by 0.03%" to "by 0.03%"
+
+- Lines 1058-1060:  remove final sentence of this paragraph.
+
+- Table 13:
+  Title seems split into two up/down cells.  Put title into a single cell.
+  Change title to:
+  "Source-to-source analysis of commons-collections-3.2.1-src.zip (with a=469)."
+
+- Table 13, t13.20:
+  Change "These results help us roughly"
+  To:    "These results, achieved in 6.169 s on an Intel core-i3 laptop, help us roughly
+  
+- Table 13, t13.20:
+  Append to the end of the caption:  ", after which additional resource intensive methods can be applied."
+
+- Table 14:
+  Change title to: "Signature Generation Rates (Intel core-i3 laptop)"
+
+- Line 1107:  change line to:
+  "Each signature in the query must be examined by the database."
+
+- Line 1109:  change line to:
+  "Each row in the output must have also been examined by the database."
+
+- Line 1121:  remove italics
+
+- Line 1124:  remove italics
+
+- Line 1130:  remove italics
+
+- Lines 1123-1127:  terrible flow with the figures.  Please reserve
+  this page for the figures only, and do not let any text sit between them.
+
+- Figure 8 title:  remove the word "useful"
+
+- Figure 9 title:  remove the word "useful"
+
+- Figure 9 title:  remove the words "(barely visible)"
+
+- Line 1145:  change "samples" to "sampled"
+
+- Line 1185:  change "81 jars studied" to "1026 jars studied (945 + 81)"
+
+- Line 1237:  remove "arguably an atypically challenging dataset"
+

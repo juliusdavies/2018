@@ -1,0 +1,290 @@
+------------
+TODO-Everyone
+------------
+
+*** Read the paper.  Especially the newer sections:  everything from section 5 to the end.
+
+
+------------
+TODO-Mike
+------------
+
+
+* MIKE-001
+----------
+Mike, Daniel, Abram.... any ideas here?  I'm not really an IDE guy!
+Maybe right-click on Jar in Eclipse, then choose "Bertillonage..." menu option?  ;-)
+The tool as we're currently using it is also not *that* bad (kinda usable):
+
+We type:   "./query.sh  commons-codec-1.5.jar  | psql maven"
+
+Anyway, here are the reviews:
+
+- The best way to improve this paper is to add a section in the Discussion
+  speculating on how to put these techniques into real-world software
+  tools. How would software engineers use this in an IDE? What would it
+  look like for corporate security officers to use this technique to
+  convince themselves that their software is compliant with all state and
+  federal regulations? How about attorneys looking for software license
+  violations to avoid embarrassing litigation (or enjoin a new lawsuit)?
+  Consider how to engage users who don't have degrees in Computer Science.
+
+  Page 17, line 6: How do you envision presenting this similarity metric
+  in a tool in an understandable way?
+
+  Page 18, line 24: A useful tool would be to compute a diff of identifiers
+  in the top matches to help the user determine which one is the best answer.
+
+  page 37: there is additional anecdotal evidence of the usefulness of
+  provenance analysis here. Is it the right place for it?
+  Maybe it could be moved somewhere else.
+
+
+
+* MIKE-002
+----------
+Do Abram or Mike want to chase this down?  Unfortunately I made it up,
+but I think it makes sense.  Hopefully there is something out there that's
+close enough!
+
+- Page 20, line 24: Add a definition of the term "byte-oriented
+  fingerprinting" and a citation to something that explains the idea.
+
+
+
+* MIKE-003
+----------
+This is my fault (Julius)....  can you guys recast what I was trying
+to say in a way that would make sense to researchers?
+
+- Re: the use of "binary fingerprint match" to avoid creating
+  "ground truth"--I do not quite understand the rationale behind this
+  decision, and further clarification in the final version would be useful.
+
+
+
+
+------------
+TODO-Daniel
+------------
+
+
+* Daniel-001 [DONE]
+------------
+Daniel, can you review this section?  Also, I think measures got confused!
+
+- pages 19 and 20: there is a summary which also includes a summary, making it
+  repetitive.
+
+(dmg) My solution: reorder text, rephrase it a little bit.
+
+
+* Daniel-002 
+------------
+(For Daniel?  This one is fun! They could mix & match artifacts from various jar
+ files to create a jar with the license they need.  Presumably if the sig
+ is identical for a given class, it fulfills the desired functionality.)
+
+- Page 12, line 40: How would the technique work in cases where just the
+  license changed? Usually that's in a comment, which doesn't end up in the
+  binary. How would a person accused of using a library inappropriately w.r.t.
+  the license be able to defend himself with Bertillonage? Do you think compilers
+  should become license and version-aware?
+
+
+
+* Daniel-003 [DONE]
+------------
+- Page 13, line 7: Table 1's font is too small by a lot.
+
+Fixed Changed to \footnote. It still fits nicely within the confines
+of the text
+
+* Daniel-004
+------------
+- still on page 15, you mention the possibility of bytecode manipulators as a
+  potential problem. A quantification of the problem right here would be nice
+  (there is a bit of data on page 18 on that).
+  
+- Page 18: How would you match generated code, like from a parser generator,
+  or Java-to-Javascript compiler?
+
+- Page 8: line 23: Wouldn't class file obsfucation thwart Bertillonage? (YUP!)
+  Did you consider tree structure of method bodies as a way to increase
+  robustness?  I recall many of the source code plagiarism tools in
+  universities relying on structure to find people who alpha-renamed the
+  identifiers of other students' work.
+
+
+
+* Daniel-005
+------------
+We never updated 'Discussion' in the journal version, so it's stale.
+
+  page 36: the discussion on the challenges of provenance mentions 81 jars
+  studied (i.e. the industrial case study). Did you find other challenges
+  based on the debian data? This should be discussed (for instance, what
+  about the byte code transformations and the systematic recompilations
+  in debian? What is their impact here?).
+
+
+
+
+------------
+TODO-Julius
+------------
+
+* Julius-004
+------------
+  Page 15, line 46: I suggest Section 5.4 be renumbered Section 6. it's big
+  enough and different enough to stand on its own.
+
+
+
+
+* Julius-006 (Dammit, have to rerun the tools!)
+------------
+
+  CAN'T DO (we didn't instrument unzip/untar:)
+  ---
+  the paper mentions that the
+  time to zip and unzip makes things much slower, without specifying further.
+  I would expect the figures about that to be included in the paper.
+
+
+
+  page 34: the explanations of table 12, and figures 7 and 8 are way too
+  shallow!  Please expand considerably on this. In particular, explain why
+  figures 7 and 8 approximate the work of the database, and discuss the
+  results.  The section on performance also lacks a summary (beyond A < B < C).
+
+
+DONE:
+  Page 33, Table 12: Please add another digit of precision to the timing numbers.
+  For numbers that small, it's better to report them in milliseconds.
+
+
+  Page 33, line 41: How often would someone have to scan the complete Maven2
+  repository? Couldn't you do it once and put it up in the cloud?
+
+
+DONE:
+  Page 34, Figure 8: The different "colors" are not visible in black and white,
+  and the shape differences are too subtle to see on 8.5 x 11 paper.
+
+
+
+* Julius-007
+------------
+  (threats-to-validity?)
+- page 22: could you elaborate on the filtering of the jars related to version
+  numbers? The consequences of this are unclear.
+
+
+
+* Julius-013
+------------
+  Page 32, line 31: Why did Maven's second snapshot have fewer exact duplicates?
+  What changed?  How many were added? How many were renamed?
+
+
+* Julius-016
+------------
+  Track down Mike's emails of bugs in the paper....
+
+
+
+
+
+DONE * Julius-001
+------------
+  on page 15, you mention a challenge about the asymmetry of the java language.
+  I would like the paper to explicitly mention the implications of this
+  challenge, and the measures that were taken towards it.
+  (bytecode sig challenge, too!)
+
+
+DONE * Julius-002
+------------
+- page 21 and later: the title "An Experiment" is not descriptive enough
+
+
+DONE * Julius-003
+------------
+  Page 31, line 7: The language in the last two sentences of this paragraph
+  overstates the likelihood that your technique works more performantly on
+  industrial applications. Please tone it down.
+
+
+DONE * Julius-005
+------------
+  Page 27, line 25: Did you validate any of your bertillonage results
+  by decompiling the binaries and comparing the files by hand?
+
+
+MUCH IMPROVED * Julius-008
+------------
+  Page 4, line 38 and 39: Data for replication should indicate that only the
+  data for the Debian study is provided. The data for Maven2 and the e-Commerce
+  application is not available at that URL.
+
+
+
+DONE * Julius-009
+------------
+  Document the changes w.r.t. the previous version in the introduction (the
+  previous version is mentioned in passing once, in the middle of the paper;
+  this is not enough).
+
+  Better connect this paper with its original version (documenting the
+  changes, the differences between the original version of the evaluation
+  and the replication)
+
+  page 29 and later: I would have liked a discussion of the differences between
+  the replication and the original experiment. Are the results identical or
+  not?  Given the changes in the precision of the signatures, and the large
+  repository, one would expect some changes. It would be especially interesting
+  to know which of the  two changes of parameters had the most impact.
+
+
+
+DONE * Julius-010
+------------
+  Page 16, line 35: Why do you think that servlet-api was used by so many
+  applications in your Maven sample set?
+
+
+
+DONE * Julius-011
+------------
+  Page 31, line 45: When speaking of the corpora, please state the numbers
+  of distinct source files and class files, since as is stated earlier,
+  there is excessive duplication in the corpora (1.65m distinct source files
+  and 2.43m distinct class files for a difference of 590000 instead of what
+  looks like 12 million). By the way, since source files can produce many
+  target classes, can you state how many actual classes there were instead
+  of class files?
+
+
+
+
+
+
+IGNORED: * Julius-012
+------------
+  Page 32, line 25: When you found mistakes in Maven2, did you let them know?
+  What happened?
+
+
+
+CITED: - Eelco's MSR paper.
+
+
+CITED: - Joel Ossher, Hitesh Sajnani, Cristina Videira Lopes:
+  File cloning in open source Java projects: The good, the bad, and the ugly. ICSM 2011: 283-292
+
+
+NOT-CITED: - Joel Ossher, Sushil Krishna Bajracharya, Cristina Videira Lopes:
+  Automated dependency resolution for open source software. MSR 2010: 130-140
+
+
