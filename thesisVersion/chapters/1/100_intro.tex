@@ -2,68 +2,84 @@
 \label{chapter:introduction}
 
 
-Deployed software systems often include code drawn from a
-variety of sources.  While the bulk of a given software system's
-source code may have been developed by a relatively stable set of known
-developers, a portion of the shipped product may have come from
-external sources.  For example, software systems commonly require the use
-of externally developed libraries, which evolve independently from the
-target system.  To ensure library compatibility --- and avoid what is often
-called ``DLL hell'' --- a target system may be packaged together with
-specific versions of libraries that are known to work with it.  In this
-way, developers can ensure that their system will run on any supported
-platform regardless of the particular versions of library components that
-clients might or might not have already installed.
+Deployed software systems often include code drawn from a variety of sources.
+While the bulk of a given software system’s source code may have been developed
+by a relatively stable set of known developers, a portion of the shipped product
+may have come from external sources. For example, software systems commonly
+require the use of externally developed libraries, which evolve independently
+from the target system. To ensure library compatibility — and avoid what is often
+called “DLL hell” — a target system may be packaged together with specific versions
+of libraries that are known to work with it. In this way, developers can ensure that
+their system will run on any supported system regardless of the particular versions
+of library components that clients might or might not have already installed.
 
-However, if software components are included without clearly identifying
-their origin then a number of technical and ethical concerns may arise.
-Technically, it is hard to maintain such a system if its dependencies are
-not well documented; for example, if a new version of a library is released
-that contains security fixes, system administrators will want to know if
-their existing applications are vulnerable.  Ethically, code fragments that
-have been copied from other sources, such as open source software, may not
-have licences that are compatible with the released system.  When this problem
-occurs within proprietary systems, resolution can be costly and
-embarrassing to the company.
+However, there currently exists no bullet-proof way to precisely and accurately
+re-establish the identity of software components, despite the importance of such
+information.  Once a complete system is deployed, the literal filenames are all that
+typically remains to identify cobundled components. If we’re lucky we might also find
+some “package.json” dependency files lying around or some Maven “pom.xml” files tucked
+inside a few of the Jar files.  But developers do weird things, hackers do nefarious
+things, and not everyone remembers to generate these files. Techniques are desired
+that allow developers and other stakeholder to establish provenance of artifacts
+regardless of any meta-data stored alongside the artifacts themselves, since such
+is not always trustworthy or reliable.
 
-Many North American financial instutions implement the Payment Card
-Industry Data Security Standard~\cite{PCI_DSS_121} (PCI DSS).  Requirement
-6 of this standard states: ``All critical systems must have the most
-recently released, appropriate software patches to protect against
-exploitation and compromise of cardholder data.''  Suppose a Java
-application running inside a financial institution is found to contain a
-dependency on a Java archive named \mytt{httpclient.jar}.  Ensuring that
-the PCI DSS requirement is satisfied entails addressing some difficult
-questions:
+A naive solution might involve building an index of artifacts of known provenance.
+The index builder could download the component from its upstream source location,
+build the component in a trusted environment, and then store a SHA1 or MD5 fingerprint
+of the final component.  This technique would immediately prove futile, since components
+(such as Jar files) typically embed the timestamps of all compiled files based on the
+moment of compilation. In other words, the fingerprint would depend on the exact moment
+of compilation, and thus it would be useless as an index.  A slightly less naive approach
+would index the compiled files themselves instead of the encompassing archive file.
+But here we still encounter significant challenges: there are many variations in environment
+that can result in slightly different compiled results. Choice of compiler, compiler options,
+optimization levels, even minor operating system differences (e.g., line endings) can all
+contribute to changes in the final compiled binary file, which in turn perturb any index.
+Since the range of these possible variations is always evolving with new compiler releases,
+new optimization techniques and so-on, pre-calculating a stable index of compiled artifacts
+is literally impossible.
 
-\begin{compactitem}
-\item  Which version of \mytt{httpclient.jar} is the application
-    currently running?
 
-\item How hard would it be to upgrade to the latest version of
-    \mytt{httpclient.jar}?
+%Many North American financial instutions implement the Payment Card
+%Industry Data Security Standard~\cite{PCI_DSS_121} (PCI DSS).  Requirement
+%6 of this standard states: ``All critical systems must have the most
+%recently released, appropriate software patches to protect against
+%exploitation and compromise of cardholder data.''  Suppose a Java
+%application running inside a financial institution is found to contain a
+%dependency on a Java archive named \mytt{httpclient.jar}.  Ensuring that
+%the PCI DSS requirement is satisfied entails addressing some difficult
+%questions:
 
-\item Has the license of \mytt{httpclient.jar} changed within the newest
-    version in a way that prevents upgrading?
+%\begin{compactitem}
+%\item  Which version of \mytt{httpclient.jar} is the application
+%    currently running?
 
-\end{compactitem}
+%\item How hard would it be to upgrade to the latest version of
+%    \mytt{httpclient.jar}?
 
-We can use a variety of techniques to address these questions.  For
-example, if we have access to the source code we can do software clone
-detection. If we have access to binaries, we can perform clone analysis of
-assembler token streams, call flow graph matching, string matching, mining
-software repositories, and historical analyses.
+%\item Has the license of \mytt{httpclient.jar} changed within the newest
+%    version in a way that prevents upgrading?
 
-This kind of investigation can be performed at various levels of
-granularity, from code chunks to function and class definitions, to files
-and subsystems up to compilation units and libraries.  But the fundamental
-question we are concerned with is this:  given a software entity, can we
-determine where it came from?  That is, how can we establish its
-\emph{provenance}?
+%\end{compactitem}
+
+%We can use a variety of techniques to address these questions.  For
+%example, if we have access to the source code we can do software clone
+%detection. If we have access to binaries, we can perform clone analysis of
+%assembler token streams, call flow graph matching, string matching, mining
+%software repositories, and historical analyses.
+
+%This kind of investigation can be performed at various levels of
+%granularity, from code chunks to function and class definitions, to files
+%and subsystems up to compilation units and libraries.  But the fundamental
+%question we are concerned with is this:  given a software entity, can we
+%determine where it came from?  That is, how can we establish its
+%\emph{provenance}?
+
+
 
 \section{Contributions}
 
-%We summarize the contributions of this paper as follows:
 \begin{enumerate}
 \item We introduce the general concept of \emph{software Bertillonage}, a
     method to reduce the search space when trying to locate a software
@@ -74,19 +90,18 @@ determine where it came from?  That is, how can we establish its
     signature matching.  This method aids in reducing the search space when
     trying to determine the identity and version of a given Java archive
     within a large
-    % authoritative     % JWD, Sep 5th, 2011:  I don't consider Maven authoritative!  It's the wild west!
     corpus of archives, such as the Maven 2 central repository.
 
 \vspace{0.7em}
 \item We establish the validity of our method with an empirical study
     of 945 binary jars from the Debian 6.0 GNU/Linux distribution.
     We demonstrate the significance of our method by replicating
-    a case study
-    of a % to find exact version information of binary jars used in a
+    a case study of a
     real world e-commerce application containing 81 binary jars.
 
 \end{enumerate}
 
-\input chapters/1/110_bertillonage
-\input chapters/1/120_background
+%\input chapters/1/110_bertillonage
+
+%\input chapters/1/120_background
 
